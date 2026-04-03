@@ -1,0 +1,9 @@
+clean_mapping_repo/
+├── index.html      ← just structure, links to the other two
+├── style.css       ← all the CSS
+├── map.js          ← all the JavaScript
+└── data/
+    ├── posting_dots_4_2.geojson
+    └── combined_sweeps.geojson
+
+    

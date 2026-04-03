@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Oakland Sweep Postings</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body { margin: 0; padding: 0; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script>
+    mapboxgl.accessToken = 'YOUR_MAPBOX_TOKEN_HERE';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/light-v11',
+        center: [-122.2712, 37.8044],
+        zoom: 12
+    });
+
+    map.on('load', () => {
+
+        // --- Load sweep road segments ---
+        map.addSource('sweep-lines', {
+            type: 'geojson',
+            data: '../data/sweep_lines.geojson'
+        });
+
+        map.addLayer({
+            id: 'sweep-lines-layer',
+            type: 'line',
+            source: 'sweep-lines',
+            paint: {
+                'line-color': [
+                    'case',
+                    ['boolean', ['feature-state', 'highlighted'], false],
+                    '#CC0000',   // highlighted
+                    '#333333'    // default
+                ],
+                'line-width': [
+                    'case',
+                    ['boolean', ['feature-state', 'highlighted'], false],
+                    6,    // highlighted
+                    3     // default
+                ],
+                'line-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'highlighted'], false],
+                    1,
+                    0.3
+                ]
+            }
+        });
+
+        // --- Load posting dots ---
+        map.addSource('dots', {
+            type: 'geojson',
+            data: '../data/dots.geojson'
+        });
+
+        map.addLayer({
+            id: 'dots-layer',
+            type: 'circle',
+            source: 'dots',
+            paint: {
+                'circle-radius': 5,
+                'circle-color': '#CC0000',
+                'circle-opacity': 0.35,
+                'circle-stroke-width': 0
+            }
+        });
+
+        // --- Click dot → highlight matching road segment ---
+        let highlightedId = null;
+
+        map.on('click', 'dots-layer', (e) => {
+            const location = e.features[0].properties.location;
+
+            // Clear previous highlight
+            if (highlightedId !== null) {
+                map.setFeatureState(
+                    { source: 'sweep-lines', id: highlightedId },
+                    { highlighted: false }
+                );
+            }
+
+            // Find matching road segment and highlight it
+            const lineFeatures = map.querySourceFeatures('sweep-lines', {
+                filter: ['==', ['get', 'location'], location]
+            });
+
+            if (lineFeatures.length > 0) {
+                highlightedId = lineFeatures[0].id;
+                map.setFeatureState(
+                    { source: 'sweep-lines', id: highlightedId },
+                    { highlighted: true }
+                );
+            }
+        });
+
+        // --- Click map background → reset highlight ---
+        map.on('click', (e) => {
+            const features = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
+            if (features.length === 0 && highlightedId !== null) {
+                map.setFeatureState(
+                    { source: 'sweep-lines', id: highlightedId },
+                    { highlighted: false }
+                );
+                highlightedId = null;
+            }
+        });
+
+        // --- Pointer cursor on dots ---
+        map.on('mouseenter', 'dots-layer', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'dots-layer', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+    });
+</script>
+
+</body>
+</html>
