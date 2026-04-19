@@ -3,7 +3,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiY29sZS1oYWRkb2NrIiwiYSI6ImNtbWtxbWRzaTF0ZWEyc
 
 const STYLE_URL = 'mapbox://styles/mapbox/light-v11';  // swap for your custom style later
 
-const DOTS_URL  = 'data/posting_dots_4_2.geojson';
+const DOTS_URL  = 'data/all_posting_dots.geojson';
 const LINES_URL = 'data/combined_sweeps.geojson';
 
 // ── State ─────────────────────────────────────────────────────────────────
