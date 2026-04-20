@@ -4,7 +4,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiY29sZS1oYWRkb2NrIiwiYSI6ImNtbWtxbWRzaTF0ZWEyc
 const STYLE_URL = 'mapbox://styles/mapbox/light-v11';  // swap for your custom style later
 
 const DOTS_URL  = 'data/all_posting_dots.geojson';
-const LINES_URL = 'data/combined_sweeps.geojson';
+const LINES_URL = 'data/combined_verified_sweeps.geojson';
 
 // ── State ─────────────────────────────────────────────────────────────────
 let selectedLocationId = null;  // unique_location_id of clicked dot's location
@@ -50,11 +50,6 @@ map.on('load', async () => {
 
   const dotsGJ  = await dotsResp.json();
   const linesGJ = await linesResp.json();
-
-  // Keep only LineStrings (skip polygons for now)
-  linesGJ.features = linesGJ.features.filter(
-    f => f.geometry.type === 'LineString'
-  );
 
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
@@ -117,7 +112,45 @@ map.on('load', async () => {
     filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
   });
 
-  // ── LAYER 4: Dots — always on top of lines ─────────────────────────────
+  // ── LAYER 4: Base polygon fills — light gray, always visible ──────────
+  map.addLayer({
+    id: 'polygons-base',
+    type: 'fill',
+    source: 'lines',
+    paint: {
+      'fill-color': '#c8c4bc',
+      'fill-opacity': 0.4,
+      'fill-outline-color': '#a8a49c',
+    },
+  });
+
+  // ── LAYER 5: Co-sweep polygon highlight — orange, hidden by default ────
+  map.addLayer({
+    id: 'polygons-sweep-highlight',
+    type: 'fill',
+    source: 'lines',
+    paint: {
+      'fill-color': '#d4762a',
+      'fill-opacity': 0.55,
+      'fill-outline-color': '#b35e1a',
+    },
+    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
+  });
+
+  // ── LAYER 6: Selected polygon highlight — red, hidden by default ───────
+  map.addLayer({
+    id: 'polygons-selected-highlight',
+    type: 'fill',
+    source: 'lines',
+    paint: {
+      'fill-color': '#cc3333',
+      'fill-opacity': 0.7,
+      'fill-outline-color': '#aa1111',
+    },
+    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
+  });
+
+  // ── LAYER 7: Dots — always on top of lines ─────────────────────────────
   // Before GP: low opacity. After GP: higher opacity. Matches old Folium look.
   map.addLayer({
     id: 'dots-layer',
@@ -161,24 +194,32 @@ map.on('load', async () => {
   });
 
   // ── Cursor changes ─────────────────────────────────────────────────────
-  map.on('mouseenter', 'dots-layer', () => {
-    map.getCanvas().style.cursor = 'pointer';
-  });
-  map.on('mouseleave', 'dots-layer', () => {
-    map.getCanvas().style.cursor = '';
+  ['dots-layer', 'polygons-base'].forEach(layer => {
+    map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
   });
 
   // ── Click a dot ────────────────────────────────────────────────────────
   map.on('click', 'dots-layer', e => {
-    // Stop event bubbling so map-background click doesn't also fire
     e.preventDefault();
-    const props = e.features[0].properties;
-    handleDotClick(props);
+    handleDotClick(e.features[0].properties);
+  });
+
+  // ── Click a line or polygon → find a matching dot and open sidebar ─────
+  ['lines-base', 'polygons-base'].forEach(layer => {
+    map.on('click', layer, e => {
+      e.preventDefault();
+      const location = e.features[0].properties.location;
+      const match = allDotFeatures.find(f => f.properties.location === location);
+      if (match) handleDotClick(match.properties);
+    });
   });
 
   // ── Click map background → reset ───────────────────────────────────────
   map.on('click', e => {
-    const hits = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
+    const hits = map.queryRenderedFeatures(e.point, {
+      layers: ['dots-layer', 'lines-base', 'polygons-base'],
+    });
     if (hits.length === 0) closeSidebar();
   });
 
@@ -195,10 +236,10 @@ function handleDotClick(props) {
   selectedPostingId  = postId;
   selectedSweepId    = sweepId;
 
-  // 1. Highlight selected line red
-  map.setFilter('lines-selected-highlight', [
-    '==', ['get', 'location'], location
-  ]);
+  // 1. Highlight selected line/polygon red
+  const selectedFilter = ['==', ['get', 'location'], location];
+  map.setFilter('lines-selected-highlight',    selectedFilter);
+  map.setFilter('polygons-selected-highlight', selectedFilter);
 
   // 2. Highlight co-sweep lines orange.
   //    We can't use Mapbox array expressions reliably because sweep_event_ids
@@ -216,11 +257,12 @@ function handleDotClick(props) {
     .map(f => f.properties.location);
 
   if (coSweepLocations.length > 0) {
-    map.setFilter('lines-sweep-highlight', [
-      'in', ['get', 'location'], ['literal', coSweepLocations]
-    ]);
+    const sweepFilter = ['in', ['get', 'location'], ['literal', coSweepLocations]];
+    map.setFilter('lines-sweep-highlight',    sweepFilter);
+    map.setFilter('polygons-sweep-highlight', sweepFilter);
   } else {
-    map.setFilter('lines-sweep-highlight', ['==', ['get', 'location'], '!!NOMATCH!!']);
+    map.setFilter('lines-sweep-highlight',    ['==', ['get', 'location'], '!!NOMATCH!!']);
+    map.setFilter('polygons-sweep-highlight', ['==', ['get', 'location'], '!!NOMATCH!!']);
   }
 
   // 3. Show ring on clicked dot
@@ -384,9 +426,12 @@ function closeSidebar() {
   selectedSweepId    = null;
 
   // Clear all highlights
-  map.setFilter('lines-selected-highlight', ['==', ['get', 'location'], '!!NOMATCH!!']);
-  map.setFilter('lines-sweep-highlight',    ['==', ['get', 'location'], '!!NOMATCH!!']);
-  map.setFilter('dots-selected-ring',       ['==', ['get', 'posting_id'], -1]);
+  const nomatch = ['==', ['get', 'location'], '!!NOMATCH!!'];
+  map.setFilter('lines-selected-highlight',    nomatch);
+  map.setFilter('lines-sweep-highlight',       nomatch);
+  map.setFilter('polygons-selected-highlight', nomatch);
+  map.setFilter('polygons-sweep-highlight',    nomatch);
+  map.setFilter('dots-selected-ring',          ['==', ['get', 'posting_id'], -1]);
 
   // Reset dots back to line positions
   resetDotPositions();
