@@ -12,7 +12,7 @@
   --highlight-row:#fff7f5;
   --font-mono:    'DM Mono', 'Courier New', monospace;
   --font-sans:    'DM Sans', 'Helvetica Neue', sans-serif;
-  --sidebar-w:    380px;
+  --sidebar-w:    500px;
   --header-h:     46px;
 }
 
@@ -212,8 +212,21 @@ header {
   border-bottom: 1px solid var(--panel-border);
   flex-shrink: 0;
   display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.summary-stat {
+  display: flex;
   align-items: baseline;
   gap: 8px;
+}
+
+.summary-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--panel-border);
+  flex-shrink: 0;
 }
 
 .summary-count {
@@ -229,6 +242,35 @@ header {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-dim);
+}
+
+/* ── Oral History Button ─────────────────────────────────────────────────── */
+.oral-history-btn {
+  position: absolute;
+  bottom: 32px;
+  right: 80px;
+  z-index: 6;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-red);
+  border: none;
+  padding: 14px 24px;
+  text-decoration: none;
+  border-radius: 2px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.15s;
+  white-space: nowrap;
+}
+
+#sidebar.open ~ .oral-history-btn {
+  right: calc(var(--sidebar-w) + 80px);
+}
+
+.oral-history-btn:hover {
+  background: #aa1111;
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */

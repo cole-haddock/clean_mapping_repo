@@ -13,6 +13,11 @@ let selectedSweepId    = null;  // sweep_event_id of clicked dot
 let activeFilter       = 'all';
 let allDotFeatures     = [];    // stashed on load for count resets
 
+// ── Geometry-type filter constants ────────────────────────────────────────
+const IS_LINE = ['==', ['geometry-type'], 'LineString'];
+const IS_POLY = ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false];
+const NOMATCH  = ['==', ['get', 'location'], '!!NOMATCH!!'];
+
 // ── Map init ──────────────────────────────────────────────────────────────
 const map = new mapboxgl.Map({
   container: 'map',
@@ -64,6 +69,7 @@ map.on('load', async () => {
     id: 'lines-base',
     type: 'line',
     source: 'lines',
+    filter: IS_LINE,
     paint: {
       'line-color': '#c8c4bc',
       'line-width': [
@@ -81,6 +87,7 @@ map.on('load', async () => {
     id: 'lines-sweep-highlight',
     type: 'line',
     source: 'lines',
+    filter: ['all', IS_LINE, NOMATCH],
     paint: {
       'line-color': '#d4762a',
       'line-width': [
@@ -91,7 +98,6 @@ map.on('load', async () => {
       ],
       'line-opacity': 0.85,
     },
-    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
   });
 
   // ── LAYER 3: Selected location highlight — red, hidden by default ──────
@@ -99,6 +105,7 @@ map.on('load', async () => {
     id: 'lines-selected-highlight',
     type: 'line',
     source: 'lines',
+    filter: ['all', IS_LINE, NOMATCH],
     paint: {
       'line-color': '#cc3333',
       'line-width': [
@@ -109,7 +116,6 @@ map.on('load', async () => {
       ],
       'line-opacity': 1,
     },
-    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
   });
 
   // ── LAYER 4: Base polygon fills — light gray, always visible ──────────
@@ -117,6 +123,7 @@ map.on('load', async () => {
     id: 'polygons-base',
     type: 'fill',
     source: 'lines',
+    filter: IS_POLY,
     paint: {
       'fill-color': '#c8c4bc',
       'fill-opacity': 0.4,
@@ -129,12 +136,12 @@ map.on('load', async () => {
     id: 'polygons-sweep-highlight',
     type: 'fill',
     source: 'lines',
+    filter: ['all', IS_POLY, NOMATCH],
     paint: {
       'fill-color': '#d4762a',
       'fill-opacity': 0.55,
       'fill-outline-color': '#b35e1a',
     },
-    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
   });
 
   // ── LAYER 6: Selected polygon highlight — red, hidden by default ───────
@@ -142,12 +149,12 @@ map.on('load', async () => {
     id: 'polygons-selected-highlight',
     type: 'fill',
     source: 'lines',
+    filter: ['all', IS_POLY, NOMATCH],
     paint: {
       'fill-color': '#cc3333',
       'fill-opacity': 0.7,
       'fill-outline-color': '#aa1111',
     },
-    filter: ['==', ['get', 'location'], '!!NOMATCH!!'],
   });
 
   // ── LAYER 7: Dots — always on top of lines ─────────────────────────────
@@ -237,9 +244,9 @@ function handleDotClick(props) {
   selectedSweepId    = sweepId;
 
   // 1. Highlight selected line/polygon red
-  const selectedFilter = ['==', ['get', 'location'], location];
-  map.setFilter('lines-selected-highlight',    selectedFilter);
-  map.setFilter('polygons-selected-highlight', selectedFilter);
+  const locMatch = ['==', ['get', 'location'], location];
+  map.setFilter('lines-selected-highlight',    ['all', IS_LINE, locMatch]);
+  map.setFilter('polygons-selected-highlight', ['all', IS_POLY, locMatch]);
 
   // 2. Highlight co-sweep lines orange.
   //    We can't use Mapbox array expressions reliably because sweep_event_ids
@@ -257,12 +264,12 @@ function handleDotClick(props) {
     .map(f => f.properties.location);
 
   if (coSweepLocations.length > 0) {
-    const sweepFilter = ['in', ['get', 'location'], ['literal', coSweepLocations]];
-    map.setFilter('lines-sweep-highlight',    sweepFilter);
-    map.setFilter('polygons-sweep-highlight', sweepFilter);
+    const inLocs = ['in', ['get', 'location'], ['literal', coSweepLocations]];
+    map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, inLocs]);
+    map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, inLocs]);
   } else {
-    map.setFilter('lines-sweep-highlight',    ['==', ['get', 'location'], '!!NOMATCH!!']);
-    map.setFilter('polygons-sweep-highlight', ['==', ['get', 'location'], '!!NOMATCH!!']);
+    map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, NOMATCH]);
+    map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, NOMATCH]);
   }
 
   // 3. Show ring on clicked dot
@@ -354,9 +361,12 @@ function buildSidebar(locId, activePostId, clickedProps) {
     new Date(b.properties.operation_start_date)
   );
 
+  const uniqueOps = new Set(features.map(f => f.properties.sweep_event_id)).size;
+
   // Location header
   document.getElementById('sb-location').textContent = clickedProps.location;
   document.getElementById('sb-count').textContent    = features.length;
+  document.getElementById('sb-ops').textContent      = uniqueOps;
 
   // Meta chips
   document.getElementById('sb-meta').innerHTML = `
@@ -382,7 +392,6 @@ function buildSidebar(locId, activePostId, clickedProps) {
           onclick="selectPostingFromTable(${p.posting_id}, ${locId})">
         <td class="td-date">${dateStr}</td>
         <td class="td-intervention">${p.intervention || p.intervention_types || '—'}</td>
-        <td>${p.district || '—'}</td>
         <td>${gpBadge}</td>
         <td class="td-sweep">${p.sweep_event_id || '—'}</td>
       </tr>
@@ -426,11 +435,10 @@ function closeSidebar() {
   selectedSweepId    = null;
 
   // Clear all highlights
-  const nomatch = ['==', ['get', 'location'], '!!NOMATCH!!'];
-  map.setFilter('lines-selected-highlight',    nomatch);
-  map.setFilter('lines-sweep-highlight',       nomatch);
-  map.setFilter('polygons-selected-highlight', nomatch);
-  map.setFilter('polygons-sweep-highlight',    nomatch);
+  map.setFilter('lines-selected-highlight',    ['all', IS_LINE, NOMATCH]);
+  map.setFilter('lines-sweep-highlight',       ['all', IS_LINE, NOMATCH]);
+  map.setFilter('polygons-selected-highlight', ['all', IS_POLY, NOMATCH]);
+  map.setFilter('polygons-sweep-highlight',    ['all', IS_POLY, NOMATCH]);
   map.setFilter('dots-selected-ring',          ['==', ['get', 'posting_id'], -1]);
 
   // Reset dots back to line positions
