@@ -182,7 +182,7 @@ map.on('load', async () => {
       'circle-color': [
         'case',
         ['in', 'Closure', ['get', 'intervention']], '#ac0000',
-        ['in', 'Deep Clean', ['get', 'intervention']], '#2a6b8a',
+        ['in', 'Deep Clean', ['get', 'intervention']], '#5c2d6e',
         '#6b6464',
       ],
       'circle-opacity': 0.7,
@@ -428,28 +428,66 @@ function buildSidebar(locId, activePostId, clickedProps) {
     if (sid && !(sid in sweepBand)) sweepBand[sid] = bandCounter++ % 2;
   });
 
-  // Table rows
+  // Compute per-sweep stats from the full dataset (all locations, not just this one)
+  const sweepStats = {};
+  allDotFeatures.forEach(f => {
+    const p   = f.properties;
+    const sid = p.sweep_event_id;
+    if (!sid) return;
+    if (!sweepStats[sid]) sweepStats[sid] = { min: null, max: null, postings: 0, locs: new Set() };
+    const s = new Date(p.operation_start_date);
+    const e = new Date(p.operation_end_date);
+    if (!sweepStats[sid].min || s < sweepStats[sid].min) sweepStats[sid].min = s;
+    if (!sweepStats[sid].max || e > sweepStats[sid].max) sweepStats[sid].max = e;
+    sweepStats[sid].postings++;
+    sweepStats[sid].locs.add(p.unique_location_id);
+  });
+
+  // ── Postings table
   const tbody = document.getElementById('sb-tbody');
   tbody.innerHTML = features.map(f => {
     const p        = f.properties;
+    const sid      = p.sweep_event_id;
     const isActive = p.posting_id === activePostId;
     const start    = formatDate(p.operation_start_date);
     const end      = formatDate(p.operation_end_date);
     const dateStr  = start === end ? start : `${start} – ${end}`;
-    const gpBadge  = p.before_after_grants_pass === 'Before'
-      ? `<span class="badge-before">Before</span>`
-      : `<span class="badge-after">After</span>`;
-    const bandClass = isActive ? 'active-row' : `sweep-band-${sweepBand[p.sweep_event_id] ?? 0}`;
+    const bandClass = isActive ? 'active-row' : `sweep-band-${sweepBand[sid] ?? 0}`;
+    const stats    = sweepStats[sid];
+    const opDays   = stats && stats.min
+      ? Math.round((stats.max - stats.min) / 86400000) + 1
+      : 1;
 
     return `
       <tr class="${bandClass}"
           data-posting-id="${p.posting_id}"
-          data-band="${sweepBand[p.sweep_event_id] ?? 0}"
+          data-band="${sweepBand[sid] ?? 0}"
           onclick="selectPostingFromTable(${p.posting_id}, ${locId})">
         <td class="td-date">${dateStr}</td>
         <td class="td-intervention">${p.intervention || p.intervention_types || '—'}</td>
-        <td>${gpBadge}</td>
-        <td class="td-sweep">${p.sweep_event_id || '—'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // ── Operations table — one row per unique sweep event at this location
+  const opsTbody = document.getElementById('sb-ops-tbody');
+  const sweepOrder = [...new Set(features.map(f => f.properties.sweep_event_id))];
+  opsTbody.innerHTML = sweepOrder.map((sid, i) => {
+    const stats   = sweepStats[sid];
+    const opDays  = stats && stats.min
+      ? Math.round((stats.max - stats.min) / 86400000) + 1
+      : 1;
+    const dateRange = stats && stats.min
+      ? `${formatDate(stats.min.toISOString())} – ${formatDate(stats.max.toISOString())}`
+      : '—';
+    const bandClass = `sweep-band-${i % 2}`;
+    return `
+      <tr class="${bandClass}">
+        <td class="td-sweep-id">${sid || '—'}</td>
+        <td class="td-date">${dateRange}</td>
+        <td class="td-oplen">${opDays}d</td>
+        <td class="td-oplen">${stats ? stats.postings : '—'}</td>
+        <td class="td-oplen">${stats ? stats.locs.size : '—'}</td>
       </tr>
     `;
   }).join('');
