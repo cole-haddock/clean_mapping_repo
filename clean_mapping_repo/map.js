@@ -13,6 +13,7 @@ let selectedSweepId    = null;  // sweep_event_id of clicked dot
 let activeFilter          = 'all';
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
+let focusMode             = true;  // when true, dots hide on location select
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -291,7 +292,10 @@ function handleDotClick(props) {
   // 4. Offset dots at this location + co-sweep locations to clicked positions
   offsetDotsForLocation(locId, sweepId);
 
-  // 5. Build and open sidebar
+  // 5. Hide dots if focus mode is on
+  if (focusMode) hideDots(); else showDots();
+
+  // 6. Build and open sidebar
   buildSidebar(locId, postId, props);
   document.getElementById('sidebar').classList.add('open');
 }
@@ -550,11 +554,37 @@ function closeSidebar() {
   map.setFilter('polygons-sweep-highlight',    ['all', IS_POLY, NOMATCH]);
   map.setFilter('dots-selected-ring',          ['==', ['get', 'posting_id'], -1]);
 
+  // Restore dots if focus mode hid them
+  showDots();
+
   // Reset dots back to line positions
   resetDotPositions();
 
   // Close panel
   document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleFocusMode() {
+  focusMode = !focusMode;
+  const btn = document.getElementById('btn-focus');
+  btn.classList.toggle('active', focusMode);
+  btn.textContent = focusMode ? 'Dots Off' : 'Dots On';
+  // If toggling off while a location is selected, restore dots
+  if (!focusMode) showDots();
+  // If toggling on while a location is selected, hide dots
+  if (focusMode && selectedLocationId) hideDots();
+}
+
+function hideDots() {
+  map.setPaintProperty('dots-layer', 'circle-opacity', 0);
+  map.setPaintProperty('dots-layer', 'circle-stroke-opacity', 0);
+  map.setPaintProperty('dots-selected-ring', 'circle-stroke-opacity', 0);
+}
+
+function showDots() {
+  map.setPaintProperty('dots-layer', 'circle-opacity', 0.7);
+  map.setPaintProperty('dots-layer', 'circle-stroke-opacity', 0.85);
+  map.setPaintProperty('dots-selected-ring', 'circle-stroke-opacity', 1);
 }
 
 // ── Filter buttons ────────────────────────────────────────────────────────
