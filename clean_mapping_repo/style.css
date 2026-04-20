@@ -351,6 +351,21 @@ tbody tr.active-row td {
   color: var(--text-primary);
 }
 
+.td-dot-cell {
+  width: 18px;
+  padding: 9px 4px 9px 10px;
+  vertical-align: middle;
+}
+
+.td-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
 .td-oplen {
   white-space: nowrap;
   color: var(--text-muted);

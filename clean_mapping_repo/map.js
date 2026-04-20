@@ -463,6 +463,7 @@ function buildSidebar(locId, activePostId, clickedProps) {
           data-posting-id="${p.posting_id}"
           data-band="${sweepBand[sid] ?? 0}"
           onclick="selectPostingFromTable(${p.posting_id}, ${locId})">
+        <td class="td-dot-cell"><span class="td-dot" style="background:${interventionColor(p.intervention)};"></span></td>
         <td class="td-date">${dateStr}</td>
         <td class="td-intervention">${p.intervention || p.intervention_types || '—'}</td>
       </tr>
@@ -597,6 +598,13 @@ function setFilter(type) {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
+function interventionColor(intervention) {
+  if (!intervention) return '#6b6464';
+  if (intervention.includes('Closure'))    return '#ac0000';
+  if (intervention.includes('Deep Clean')) return '#5c2d6e';
+  return '#6b6464';
+}
+
 function formatDate(str) {
   if (!str) return '—';
   const d = new Date(str.includes('T') ? str : str + 'T00:00:00');
