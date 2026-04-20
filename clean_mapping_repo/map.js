@@ -483,7 +483,7 @@ function setFilter(type) {
 // ── Helpers ───────────────────────────────────────────────────────────────
 function formatDate(str) {
   if (!str) return '—';
-  const d = new Date(str + 'T00:00:00');  // force local time, avoid UTC offset issues
+  const d = new Date(str.includes('T') ? str : str + 'T00:00:00');
   return d.toLocaleDateString('en-US', {
     month: 'short',
     day:   'numeric',
