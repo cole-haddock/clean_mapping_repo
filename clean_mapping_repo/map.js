@@ -166,8 +166,8 @@ map.on('load', async () => {
     },
   });
 
-  // ── LAYER 7: Dots — always on top of lines ─────────────────────────────
-  // Before GP: low opacity. After GP: higher opacity. Matches old Folium look.
+  // ── LAYER 7: Dots — colored by intervention type ──────────────────────
+  // Closure → red, Deep Cleaning → blue, Other/mixed → gray
   map.addLayer({
     id: 'dots-layer',
     type: 'circle',
@@ -179,19 +179,16 @@ map.on('load', async () => {
         13, 5,
         16, 8,
       ],
-      'circle-color': '#ac0000',
-      'circle-opacity': [
+      'circle-color': [
         'case',
-        ['==', ['get', 'before_after_grants_pass'], 'Before'], 0.25,
-        0.65,
+        ['in', 'Closure', ['get', 'intervention']], '#ac0000',
+        ['in', 'Deep Clean', ['get', 'intervention']], '#2a6b8a',
+        '#6b6464',
       ],
+      'circle-opacity': 0.7,
       'circle-stroke-width': ['case', ['boolean', ['get', 'is_clicked'], false], 1.5, 0],
       'circle-stroke-color': '#ffffff',
-      'circle-stroke-opacity': [
-        'case',
-        ['==', ['get', 'before_after_grants_pass'], 'Before'], 0.25,
-        0.65,
-      ],
+      'circle-stroke-opacity': 0.85,
     },
   });
 
