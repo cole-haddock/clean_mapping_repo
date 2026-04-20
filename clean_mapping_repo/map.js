@@ -3,15 +3,16 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiY29sZS1oYWRkb2NrIiwiYSI6ImNtbWtxbWRzaTF0ZWEyc
 
 const STYLE_URL = 'mapbox://styles/mapbox/light-v11';  // swap for your custom style later
 
-const DOTS_URL  = 'data/all_posting_dots.geojson';
+const DOTS_URL  = 'data/all_posting_dots_corrected.geojson';
 const LINES_URL = 'data/combined_verified_sweeps.geojson';
 
 // ── State ─────────────────────────────────────────────────────────────────
 let selectedLocationId = null;  // unique_location_id of clicked dot's location
 let selectedPostingId  = null;  // posting_id of the clicked dot
 let selectedSweepId    = null;  // sweep_event_id of clicked dot
-let activeFilter       = 'all';
-let allDotFeatures     = [];    // stashed on load for count resets
+let activeFilter          = 'all';
+let allDotFeatures        = [];    // stashed on load for count resets
+let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -59,6 +60,14 @@ map.on('load', async () => {
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
   updateDotCount(allDotFeatures.length);
+
+  // Build posting_id → geometry location fallback for encoding mismatches
+  linesGJ.features.forEach(f => {
+    const loc = f.properties.location;
+    parseSweepIds(f.properties.posting_ids).forEach(pid => {
+      postingIdToGeomLoc[String(pid)] = loc;
+    });
+  });
 
   // ── Sources ────────────────────────────────────────────────────────────
   map.addSource('lines', { type: 'geojson', data: linesGJ });
@@ -222,7 +231,24 @@ map.on('load', async () => {
   ['lines-base', 'polygons-base'].forEach(layer => {
     map.on('click', layer, e => {
       e.preventDefault();
-      const location = e.features[0].properties.location;
+      // If a dot is at this point, let the dot handler take precedence
+      const dotsHere = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
+      if (dotsHere.length > 0) return;
+
+      // Pick the smallest polygon/line at this point by bounding box area
+      const hits = map.queryRenderedFeatures(e.point, { layers: ['lines-base', 'polygons-base'] });
+      const smallest = hits.reduce((best, f) => {
+        const coords = f.geometry.type === 'MultiPolygon'
+          ? f.geometry.coordinates.flat(2)
+          : f.geometry.coordinates.flat(1);
+        const lons = coords.map(c => c[0]);
+        const lats = coords.map(c => c[1]);
+        const area = (Math.max(...lons) - Math.min(...lons)) * (Math.max(...lats) - Math.min(...lats));
+        return (!best || area < best.area) ? { f, area } : best;
+      }, null);
+
+      if (!smallest) return;
+      const location = smallest.f.properties.location;
       const match = allDotFeatures.find(f => f.properties.location === location);
       if (match) handleDotClick(match.properties);
     });
@@ -250,12 +276,14 @@ function handleDotClick(props) {
   selectedSweepId    = sweepId;
 
   // 1. Highlight selected line/polygon red
-  const locMatch = ['==', ['get', 'location'], location];
+  // Use posting_id lookup as fallback for encoding-mismatched location strings
+  const geomLocation = postingIdToGeomLoc[String(postId)] || location;
+  const locMatch = ['==', ['get', 'location'], geomLocation];
   map.setFilter('lines-selected-highlight',    ['all', IS_LINE, locMatch]);
   map.setFilter('polygons-selected-highlight', ['all', IS_POLY, locMatch]);
 
   // 2. Highlight co-sweep lines/polygons
-  const coSweepLocations = getCoSweepLocations(sweepId, location);
+  const coSweepLocations = getCoSweepLocations(sweepId, geomLocation);
   applyCoSweepHighlights(coSweepLocations);
 
   // 3. Show ring on clicked dot
@@ -395,6 +423,14 @@ function buildSidebar(locId, activePostId, clickedProps) {
     <span class="meta-chip">${clickedProps.sensitivity_zone || '—'}</span>
   `;
 
+  // Assign alternating band per sweep event (in order of first appearance)
+  const sweepBand = {};
+  let bandCounter = 0;
+  features.forEach(f => {
+    const sid = f.properties.sweep_event_id;
+    if (sid && !(sid in sweepBand)) sweepBand[sid] = bandCounter++ % 2;
+  });
+
   // Table rows
   const tbody = document.getElementById('sb-tbody');
   tbody.innerHTML = features.map(f => {
@@ -406,10 +442,12 @@ function buildSidebar(locId, activePostId, clickedProps) {
     const gpBadge  = p.before_after_grants_pass === 'Before'
       ? `<span class="badge-before">Before</span>`
       : `<span class="badge-after">After</span>`;
+    const bandClass = isActive ? 'active-row' : `sweep-band-${sweepBand[p.sweep_event_id] ?? 0}`;
 
     return `
-      <tr class="${isActive ? 'active-row' : ''}"
+      <tr class="${bandClass}"
           data-posting-id="${p.posting_id}"
+          data-band="${sweepBand[p.sweep_event_id] ?? 0}"
           onclick="selectPostingFromTable(${p.posting_id}, ${locId})">
         <td class="td-date">${dateStr}</td>
         <td class="td-intervention">${p.intervention || p.intervention_types || '—'}</td>
@@ -447,13 +485,15 @@ function selectPostingFromTable(postingId, locId) {
     '==', ['get', 'posting_id'], postingId
   ]);
 
-  // Update active row in table
+  // Update active row in table, restoring band class on deactivated rows
   const tbody = document.getElementById('sb-tbody');
   tbody.querySelectorAll('tr').forEach(row => {
-    row.classList.toggle(
-      'active-row',
-      parseInt(row.dataset.postingId) === postingId
-    );
+    const isActive = parseInt(row.dataset.postingId) === postingId;
+    row.classList.toggle('active-row', isActive);
+    if (!isActive) {
+      const band = row.dataset.band;
+      row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
+    }
   });
 
   // Scroll into view

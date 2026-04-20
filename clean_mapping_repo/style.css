@@ -319,6 +319,14 @@ tbody tr:hover {
   background: #faf9f7;
 }
 
+tbody tr.sweep-band-0 {
+  background: #f5f4f2;
+}
+
+tbody tr.sweep-band-1 {
+  background: #eceae7;
+}
+
 tbody tr.active-row {
   background: var(--highlight-row);
   border-left: 2px solid var(--accent-red);
