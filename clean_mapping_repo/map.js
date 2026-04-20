@@ -71,7 +71,7 @@ map.on('load', async () => {
     source: 'lines',
     filter: IS_LINE,
     paint: {
-      'line-color': '#c8c4bc',
+      'line-color': '#b5aeae',
       'line-width': [
         'interpolate', ['linear'], ['zoom'],
         10, 1.5,
@@ -89,7 +89,7 @@ map.on('load', async () => {
     source: 'lines',
     filter: ['all', IS_LINE, NOMATCH],
     paint: {
-      'line-color': '#d4762a',
+      'line-color': '#ac0000',
       'line-width': [
         'interpolate', ['linear'], ['zoom'],
         10, 3,
@@ -107,7 +107,7 @@ map.on('load', async () => {
     source: 'lines',
     filter: ['all', IS_LINE, NOMATCH],
     paint: {
-      'line-color': '#cc3333',
+      'line-color': '#5d0000',
       'line-width': [
         'interpolate', ['linear'], ['zoom'],
         10, 4,
@@ -125,9 +125,9 @@ map.on('load', async () => {
     source: 'lines',
     filter: IS_POLY,
     paint: {
-      'fill-color': '#c8c4bc',
+      'fill-color': '#b5aeae',
       'fill-opacity': 0.4,
-      'fill-outline-color': '#a8a49c',
+      'fill-outline-color': '#b5aeae',
     },
   });
 
@@ -138,9 +138,9 @@ map.on('load', async () => {
     source: 'lines',
     filter: ['all', IS_POLY, NOMATCH],
     paint: {
-      'fill-color': '#d4762a',
+      'fill-color': '#ac0000',
       'fill-opacity': 0.55,
-      'fill-outline-color': '#b35e1a',
+      'fill-outline-color': '#ac0000',
     },
   });
 
@@ -151,9 +151,9 @@ map.on('load', async () => {
     source: 'lines',
     filter: ['all', IS_POLY, NOMATCH],
     paint: {
-      'fill-color': '#cc3333',
+      'fill-color': '#5d0000',
       'fill-opacity': 0.7,
-      'fill-outline-color': '#aa1111',
+      'fill-outline-color': '#5d0000',
     },
   });
 
@@ -170,13 +170,19 @@ map.on('load', async () => {
         13, 5,
         16, 8,
       ],
-      'circle-color': '#cc3333',
+      'circle-color': '#ac0000',
       'circle-opacity': [
         'case',
         ['==', ['get', 'before_after_grants_pass'], 'Before'], 0.25,
         0.65,
       ],
-      'circle-stroke-width': 0,
+      'circle-stroke-width': ['case', ['boolean', ['get', 'is_clicked'], false], 1.5, 0],
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-opacity': [
+        'case',
+        ['==', ['get', 'before_after_grants_pass'], 'Before'], 0.25,
+        0.65,
+      ],
     },
   });
 
@@ -194,7 +200,7 @@ map.on('load', async () => {
       ],
       'circle-color': 'transparent',
       'circle-stroke-width': 2.5,
-      'circle-stroke-color': '#cc3333',
+      'circle-stroke-color': '#ac0000',
       'circle-opacity': 0,
     },
     filter: ['==', ['get', 'posting_id'], -1],  // hidden by default
@@ -248,21 +254,36 @@ function handleDotClick(props) {
   map.setFilter('lines-selected-highlight',    ['all', IS_LINE, locMatch]);
   map.setFilter('polygons-selected-highlight', ['all', IS_POLY, locMatch]);
 
-  // 2. Highlight co-sweep lines orange.
-  //    We can't use Mapbox array expressions reliably because sweep_event_ids
-  //    is inconsistently serialized in the GeoJSON (some are arrays, some strings).
-  //    Instead: find matching location names in JS, then filter by those names.
-  const linesSource  = map.getSource('lines');
-  const allLines     = linesSource._data.features;
+  // 2. Highlight co-sweep lines/polygons
+  const coSweepLocations = getCoSweepLocations(sweepId, location);
+  applyCoSweepHighlights(coSweepLocations);
 
-  const coSweepLocations = allLines
+  // 3. Show ring on clicked dot
+  map.setFilter('dots-selected-ring', [
+    '==', ['get', 'posting_id'], postId
+  ]);
+
+  // 4. Offset dots at this location + co-sweep locations to clicked positions
+  offsetDotsForLocation(locId, sweepId);
+
+  // 5. Build and open sidebar
+  buildSidebar(locId, postId, props);
+  document.getElementById('sidebar').classList.add('open');
+}
+
+// ── Get co-sweep location names for a given sweep event ───────────────────
+function getCoSweepLocations(sweepId, excludeLocation) {
+  const allLines = map.getSource('lines')._data.features;
+  return allLines
     .filter(f => {
-      if (f.properties.location === location) return false; // skip selected
-      const ids = parseSweepIds(f.properties.sweep_event_ids);
-      return ids.includes(sweepId);
+      if (f.properties.location === excludeLocation) return false;
+      return parseSweepIds(f.properties.sweep_event_ids).includes(sweepId);
     })
     .map(f => f.properties.location);
+}
 
+// ── Apply co-sweep highlights to lines/polygon layers ─────────────────────
+function applyCoSweepHighlights(coSweepLocations) {
   if (coSweepLocations.length > 0) {
     const inLocs = ['in', ['get', 'location'], ['literal', coSweepLocations]];
     map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, inLocs]);
@@ -271,18 +292,6 @@ function handleDotClick(props) {
     map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, NOMATCH]);
     map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, NOMATCH]);
   }
-
-  // 3. Show ring on clicked dot
-  map.setFilter('dots-selected-ring', [
-    '==', ['get', 'posting_id'], postId
-  ]);
-
-  // 4. Offset dots at this location to clicked positions
-  offsetDotsForLocation(locId);
-
-  // 5. Build and open sidebar
-  buildSidebar(locId, postId, props);
-  document.getElementById('sidebar').classList.add('open');
 }
 
 // ── Parse sweep_event_ids field (handles array or Python string) ──────────
@@ -299,25 +308,39 @@ function parseSweepIds(val) {
     .filter(Boolean);
 }
 
-// ── Move dots at selected location to offset (clicked) positions ──────────
-function offsetDotsForLocation(locId) {
-  const source  = map.getSource('dots');
-  const current = source._data;
+// ── Update dot clicked state without resetting unaffected dots ────────────
+function offsetDotsForLocation(locId, sweepId) {
+  const source   = map.getSource('dots');
+  const features = source._data.features;
+
+  const coSweepLocIds = new Set(
+    features
+      .filter(f => f.properties.sweep_event_id === sweepId && f.properties.unique_location_id !== locId)
+      .map(f => f.properties.unique_location_id)
+  );
 
   const updated = {
-    ...current,
-    features: current.features.map(f => {
-      if (f.properties.unique_location_id !== locId) return f;
-      return {
-        ...f,
-        geometry: {
-          type: 'Point',
-          coordinates: [
-            f.properties.clicked_lon,
-            f.properties.clicked_lat,
-          ],
-        },
-      };
+    ...source._data,
+    features: features.map(f => {
+      const p          = f.properties;
+      const shouldClick = p.unique_location_id === locId || coSweepLocIds.has(p.unique_location_id);
+      const isClicked   = !!p.is_clicked;
+
+      if (shouldClick && !isClicked) {
+        return {
+          ...f,
+          properties: { ...p, is_clicked: true },
+          geometry: { type: 'Point', coordinates: [p.clicked_lon, p.clicked_lat] },
+        };
+      }
+      if (!shouldClick && isClicked) {
+        return {
+          ...f,
+          properties: { ...p, is_clicked: false },
+          geometry: { type: 'Point', coordinates: [p.load_lon, p.load_lat] },
+        };
+      }
+      return f;
     }),
   };
 
@@ -334,12 +357,10 @@ function resetDotPositions() {
     ...current,
     features: current.features.map(f => ({
       ...f,
+      properties: { ...f.properties, is_clicked: false },
       geometry: {
         type: 'Point',
-        coordinates: [
-          f.properties.load_lon,
-          f.properties.load_lat,
-        ],
+        coordinates: [f.properties.load_lon, f.properties.load_lat],
       },
     })),
   };
@@ -408,6 +429,18 @@ function buildSidebar(locId, activePostId, clickedProps) {
 // ── Click a table row ─────────────────────────────────────────────────────
 function selectPostingFromTable(postingId, locId) {
   selectedPostingId = postingId;
+
+  // Look up this posting's sweep_event_id and location
+  const feat = map.getSource('dots')._data.features
+    .find(f => f.properties.posting_id === postingId);
+  if (feat) {
+    const sweepId  = feat.properties.sweep_event_id;
+    const location = feat.properties.location;
+    selectedSweepId = sweepId;
+    const coSweepLocations = getCoSweepLocations(sweepId, location);
+    applyCoSweepHighlights(coSweepLocations);
+    offsetDotsForLocation(locId, sweepId);
+  }
 
   // Move ring to this dot
   map.setFilter('dots-selected-ring', [

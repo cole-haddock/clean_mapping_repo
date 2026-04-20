@@ -1,15 +1,15 @@
 /* ── Variables ─────────────────────────────────────────────────────────── */
 :root {
-  --bg:           #f5f3ef;
+  --bg:           #e4e4e4;
   --panel-bg:     #ffffff;
-  --panel-border: #e0ddd8;
-  --text-primary: #1a1a1a;
-  --text-muted:   #6b6b6b;
-  --text-dim:     #b0aba3;
-  --accent-red:   #cc3333;
-  --accent-orange:#d4762a;
-  --accent-yellow:#a07c20;
-  --highlight-row:#fff7f5;
+  --panel-border: #b5aeae;
+  --text-primary: #343131;
+  --text-muted:   #6b6464;
+  --text-dim:     #b5aeae;
+  --accent-red:   #ac0000;
+  --accent-orange:#5d0000;
+  --accent-yellow:#5d0000;
+  --highlight-row:#f9f0f0;
   --font-mono:    'DM Mono', 'Courier New', monospace;
   --font-sans:    'DM Sans', 'Helvetica Neue', sans-serif;
   --sidebar-w:    500px;
