@@ -555,7 +555,7 @@ tbody tr.active-row td {
 
 .ls-filter-label {
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -613,6 +613,28 @@ tbody tr.active-row td {
   color: #fff;
 }
 
+/* Mayor dropdown header */
+.ls-mayor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 4px 7px;
+  cursor: pointer;
+}
+
+.ls-mayor-header:hover { color: var(--accent-red); }
+
+.ls-mayor-header .ls-chevron { font-size: 12px; }
+
 /* Mayor checkboxes */
 .ls-mayor-list {
   display: flex;
@@ -644,7 +666,7 @@ tbody tr.active-row td {
   color: var(--text-dim);
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 0 6px 5px 0;
+  padding: 8px 6px 8px 0;
   border-bottom: 1px solid var(--panel-border);
 }
 

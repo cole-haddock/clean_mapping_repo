@@ -11,6 +11,8 @@ let selectedLocationId = null;  // unique_location_id of clicked dot's location
 let selectedPostingId  = null;  // posting_id of the clicked dot
 let selectedSweepId    = null;  // sweep_event_id of clicked dot
 let activeFilter          = 'all';
+let dateFrom              = null;   // YYYY-MM-DD string or null
+let dateTo                = null;   // YYYY-MM-DD string or null
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
@@ -20,6 +22,16 @@ let geomByLocation        = {};    // location string → geometry feature (for 
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
 const IS_POLY = ['match', ['geometry-type'], ['Polygon', 'MultiPolygon'], true, false];
 const NOMATCH  = ['==', ['get', 'location'], '!!NOMATCH!!'];
+
+const GP_DATE = '2024-06-28';  // Grants Pass v. Johnson decision date
+
+const MAYOR_TERMS = [
+  { id: 'mayor-schaaf',   start: '2015-01-05', end: '2023-01-09' },
+  { id: 'mayor-thao',     start: '2023-01-09', end: '2024-12-17' },
+  { id: 'mayor-bas',      start: '2024-12-17', end: '2025-01-06' },
+  { id: 'mayor-jenkins',  start: '2025-01-06', end: '2025-05-20' },
+  { id: 'mayor-lee',      start: '2025-05-20', end: '2099-12-31' },
+];
 
 // ── Map init ──────────────────────────────────────────────────────────────
 const map = new mapboxgl.Map({
@@ -660,6 +672,11 @@ function toggleFiltersPanel() {
   document.getElementById('filters-chevron').classList.toggle('closed');
 }
 
+function toggleMayorsPanel() {
+  document.getElementById('mayors-body').classList.toggle('closed');
+  document.getElementById('mayors-chevron').classList.toggle('closed');
+}
+
 function toggleFocusMode() {
   focusMode = !focusMode;
   const btn = document.getElementById('btn-focus');
@@ -683,50 +700,105 @@ function showDots() {
   map.setPaintProperty('dots-selected-ring', 'circle-stroke-opacity', 1);
 }
 
+// ── Mayor term helpers ────────────────────────────────────────────────────
+function getCheckedMayors() {
+  return MAYOR_TERMS.filter(m => {
+    const el = document.getElementById(m.id);
+    return el ? el.checked : true;
+  });
+}
+
+function buildMayorFilter() {
+  const checked = getCheckedMayors();
+  if (checked.length === MAYOR_TERMS.length) return null;
+  if (checked.length === 0) return ['==', ['literal', 1], 0];
+  const ranges = checked.map(m => ['all',
+    ['>=', ['slice', ['get', 'operation_start_date'], 0, 10], m.start],
+    ['<',  ['slice', ['get', 'operation_start_date'], 0, 10], m.end],
+  ]);
+  return ranges.length === 1 ? ranges[0] : ['any', ...ranges];
+}
+
+// ── Build combined Mapbox filter expression ───────────────────────────────
+function buildDotFilter() {
+  const parts = [];
+
+  switch (activeFilter) {
+    case 'after':  parts.push(['>=', ['slice', ['get', 'operation_start_date'], 0, 10], GP_DATE]); break;
+    case 'before': parts.push(['<',  ['slice', ['get', 'operation_start_date'], 0, 10], GP_DATE]); break;
+    case 'closure':  parts.push(['in', 'Closure', ['downcase', ['get', 'intervention']]]); break;
+    case 'cleaning': parts.push(['in', 'Deep Cleaning', ['get', 'intervention']]); break;
+  }
+
+  if (dateFrom) parts.push(['>=', ['slice', ['get', 'operation_start_date'], 0, 10], dateFrom]);
+  if (dateTo)   parts.push(['<=', ['slice', ['get', 'operation_start_date'], 0, 10], dateTo]);
+
+  const mayorFilter = buildMayorFilter();
+  if (mayorFilter) parts.push(mayorFilter);
+
+  return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
+}
+
+// ── JS-side filter for count updates ─────────────────────────────────────
+function applyJsFilter(features) {
+  return features.filter(f => {
+    const p = f.properties;
+    const d = p.operation_start_date ? p.operation_start_date.slice(0, 10) : null;
+    if (activeFilter === 'after'   && (!d || d <  GP_DATE)) return false;
+    if (activeFilter === 'before'  && (!d || d >= GP_DATE)) return false;
+    if (activeFilter === 'closure' && !(p.intervention && p.intervention.toLowerCase().includes('closure'))) return false;
+    if (activeFilter === 'cleaning'&& !(p.intervention && p.intervention.includes('Deep Cleaning')))        return false;
+    if (dateFrom && d && d < dateFrom) return false;
+    if (dateTo   && d && d > dateTo)   return false;
+    const checked = getCheckedMayors();
+    if (checked.length < MAYOR_TERMS.length && d) {
+      if (!checked.some(m => d >= m.start && d < m.end)) return false;
+    }
+    return true;
+  });
+}
+
+// ── Mayor checkbox filter ─────────────────────────────────────────────────
+function applyMayorFilter() {
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
+
 // ── Filter buttons ────────────────────────────────────────────────────────
 function setFilter(type) {
   activeFilter = type;
 
-  // Update button active states
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById(`btn-${type}`);
   if (btn) btn.classList.add('active');
 
-  // Build Mapbox filter expression for dots layer
-  let expr = null;
-  switch (type) {
-    case 'after':
-      expr = ['==', ['get', 'before_after_grants_pass'], 'After'];
-      break;
-    case 'before':
-      expr = ['==', ['get', 'before_after_grants_pass'], 'Before'];
-      break;
-    case 'closure':
-      expr = ['in', 'Closure', ['downcase', ['get', 'intervention']]];
-      break;
-    case 'cleaning':
-      expr = ['in', 'Deep Cleaning', ['get', 'intervention']];
-      break;
-    default:
-      expr = null;  // show all
-  }
+  document.getElementById('gp-before').classList.toggle('active', type === 'before');
+  document.getElementById('gp-after').classList.toggle('active', type === 'after');
 
-  map.setFilter('dots-layer', expr);
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
 
-  const filtered = expr === null
-    ? allDotFeatures
-    : allDotFeatures.filter(f => {
-        const p = f.properties;
-        if (activeFilter === 'after')   return p.before_after_grants_pass === 'After';
-        if (activeFilter === 'before')  return p.before_after_grants_pass === 'Before';
-        if (activeFilter === 'closure') return p.intervention && p.intervention.toLowerCase().includes('closure');
-        if (activeFilter === 'cleaning') return p.intervention && p.intervention.includes('Deep Cleaning');
-        return true;
-      });
-  updateCounts(filtered);
+// ── Date range filter ─────────────────────────────────────────────────────
+function applyDateFilter() {
+  dateFrom = document.getElementById('ls-date-from').value || null;
+  dateTo   = document.getElementById('ls-date-to').value   || null;
+
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
 }
 
 function resetFilters() {
+  dateFrom = null;
+  dateTo   = null;
+  const fromEl = document.getElementById('ls-date-from');
+  const toEl   = document.getElementById('ls-date-to');
+  if (fromEl) fromEl.value = '';
+  if (toEl)   toEl.value   = '';
+  MAYOR_TERMS.forEach(m => {
+    const el = document.getElementById(m.id);
+    if (el) el.checked = true;
+  });
   setFilter('all');
 }
 

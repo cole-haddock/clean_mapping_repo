@@ -16,8 +16,8 @@
     <div class="filter-strip">
       <span class="filter-label">Filter</span>
       <button class="filter-btn active" id="btn-all"      onclick="setFilter('all')">All</button>
-      <button class="filter-btn"        id="btn-after"    onclick="setFilter('after')">After GP</button>
-      <button class="filter-btn before" id="btn-before"   onclick="setFilter('before')">Before GP</button>
+      <button class="filter-btn"        id="btn-after"    onclick="setFilter('after')">After Grants Pass</button>
+      <button class="filter-btn before" id="btn-before"   onclick="setFilter('before')">Before Grants Pass</button>
       <button class="filter-btn"        id="btn-closure"  onclick="setFilter('closure')">Closure</button>
       <button class="filter-btn"        id="btn-cleaning" onclick="setFilter('cleaning')">Deep Clean</button>
       <button class="filter-btn reset-btn"                onclick="resetFilters()">Reset</button>
@@ -53,64 +53,68 @@
             <div class="ls-filter-group">
               <div class="ls-filter-label">Time Range</div>
               <div class="ls-time-inputs">
-                <input class="ls-date-input" type="text" placeholder="From" />
+                <input class="ls-date-input" type="date" id="ls-date-from" oninput="applyDateFilter()" />
                 <span class="ls-date-sep">–</span>
-                <input class="ls-date-input" type="text" placeholder="To" />
+                <input class="ls-date-input" type="date" id="ls-date-to" oninput="applyDateFilter()" />
               </div>
             </div>
 
             <div class="ls-filter-group">
-              <div class="ls-filter-label">Grants Pass</div>
+              <div class="ls-filter-label">Grants Pass v. Johnson</div>
               <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="gp-before">Before</button>
-                <button class="ls-toggle-btn" id="gp-after">After</button>
+                <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
+                <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
               </div>
             </div>
 
             <div class="ls-filter-group">
-              <div class="ls-filter-label">Mayor</div>
-              <table class="ls-mayor-table">
-                <thead>
-                  <tr>
-                    <th></th>
-                    <th>Mayor</th>
-                    <th>Start</th>
-                    <th>End</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><input type="checkbox" checked /></td>
-                    <td>Schaaf</td>
-                    <td>Jan '15</td>
-                    <td>Jan '23</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox" checked /></td>
-                    <td>Thao</td>
-                    <td>Jan '23</td>
-                    <td>Dec '24</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox" checked /></td>
-                    <td>Fortunato Bas</td>
-                    <td>Dec '24</td>
-                    <td>Jan '25</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox" checked /></td>
-                    <td>Jenkins</td>
-                    <td>Jan '25</td>
-                    <td>May '25</td>
-                  </tr>
-                  <tr>
-                    <td><input type="checkbox" checked /></td>
-                    <td>Lee</td>
-                    <td>May '25</td>
-                    <td>Present</td>
-                  </tr>
-                </tbody>
-              </table>
+              <button class="ls-mayor-header" onclick="toggleMayorsPanel()">
+                Mayoral Terms <span class="ls-chevron" id="mayors-chevron">▼</span>
+              </button>
+              <div class="ls-section-body closed" id="mayors-body">
+                <table class="ls-mayor-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Mayor</th>
+                      <th>Term Start</th>
+                      <th>Term End</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="checkbox" id="mayor-schaaf" checked onchange="applyMayorFilter()" /></td>
+                      <td>Schaaf</td>
+                      <td>Jan 2015</td>
+                      <td>Jan 2023</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" id="mayor-thao" checked onchange="applyMayorFilter()" /></td>
+                      <td>Thao</td>
+                      <td>Jan 2023</td>
+                      <td>Dec 2024</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" id="mayor-bas" checked onchange="applyMayorFilter()" /></td>
+                      <td>Fortunato Bas</td>
+                      <td>Dec 2024</td>
+                      <td>Jan 2025</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" id="mayor-jenkins" checked onchange="applyMayorFilter()" /></td>
+                      <td>Jenkins</td>
+                      <td>Jan 2025</td>
+                      <td>May 2025</td>
+                    </tr>
+                    <tr>
+                      <td><input type="checkbox" id="mayor-lee" checked onchange="applyMayorFilter()" /></td>
+                      <td>Lee</td>
+                      <td>May 2025</td>
+                      <td>Present</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <button class="ls-reset-btn" onclick="resetFilters()">Reset Filters</button>
