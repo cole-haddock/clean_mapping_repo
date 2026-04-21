@@ -215,7 +215,7 @@ map.on('load', async () => {
   });
 
   // ── Cursor changes ─────────────────────────────────────────────────────
-  ['dots-layer', 'polygons-base'].forEach(layer => {
+  ['dots-layer', 'lines-base', 'polygons-base'].forEach(layer => {
     map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
     map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
   });
@@ -230,16 +230,19 @@ map.on('load', async () => {
   ['lines-base', 'polygons-base'].forEach(layer => {
     map.on('click', layer, e => {
       e.preventDefault();
-      // If a visible dot is at this point, let the dot handler take precedence
+      // If dots are currently visible at this point, let the dot handler take precedence
       const dotsHere = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
-      if (!focusMode && dotsHere.length > 0) return;
+      const dotsVisible = !focusMode || selectedLocationId === null;
+      if (dotsVisible && dotsHere.length > 0) return;
 
       // Pick the smallest polygon/line at this point by bounding box area
       const hits = map.queryRenderedFeatures(e.point, { layers: ['lines-base', 'polygons-base'] });
       const smallest = hits.reduce((best, f) => {
         const coords = f.geometry.type === 'MultiPolygon'
           ? f.geometry.coordinates.flat(2)
-          : f.geometry.coordinates.flat(1);
+          : f.geometry.type === 'Polygon'
+            ? f.geometry.coordinates.flat(1)
+            : f.geometry.coordinates;  // LineString: already [[lng, lat], ...]
         const lons = coords.map(c => c[0]);
         const lats = coords.map(c => c[1]);
         const area = (Math.max(...lons) - Math.min(...lons)) * (Math.max(...lats) - Math.min(...lats));
@@ -248,7 +251,11 @@ map.on('load', async () => {
 
       if (!smallest) return;
       const location = smallest.f.properties.location;
-      const match = allDotFeatures.find(f => f.properties.location === location);
+      let match = allDotFeatures.find(f => f.properties.location === location);
+      if (!match) {
+        const pids = new Set(parseSweepIds(smallest.f.properties.posting_ids).map(String));
+        match = allDotFeatures.find(f => pids.has(String(f.properties.posting_id)));
+      }
       if (match) handleDotClick(match.properties);
     });
   });
@@ -421,7 +428,11 @@ function buildSidebar(locId, activePostId, clickedProps) {
     const geomLoc  = postingIdToGeomLoc[String(clickedProps.posting_id)] || clickedProps.location;
     const geomFeat = map.getSource('lines')._data.features.find(f => f.properties.location === geomLoc);
     if (geomFeat) {
-      const dedup = val => val ? [...new Set(val.split(',').map(s => s.trim()))].join(', ') : null;
+      const dedup = val => {
+        if (!val) return null;
+        if (Array.isArray(val)) return [...new Set(val)].join(', ');
+        return [...new Set(val.split(',').map(s => s.trim()))].join(', ');
+      };
       district        = district        || dedup(geomFeat.properties.district);
       sensitivityZone = sensitivityZone || dedup(geomFeat.properties.sensitivity_zone);
     }
@@ -501,7 +512,10 @@ function buildSidebar(locId, activePostId, clickedProps) {
       : '—';
     const bandClass = `sweep-band-${i % 2}`;
     return `
-      <tr class="${bandClass}">
+      <tr class="${bandClass}"
+          data-sweep-id="${sid}"
+          data-band="${i % 2}"
+          onclick="selectOperationFromTable('${sid}', ${locId})">
         <td class="td-sweep-id">${sid || '—'}</td>
         <td class="td-date">${dateRange}</td>
         <td class="td-oplen">${opDays}d</td>
@@ -553,6 +567,51 @@ function selectPostingFromTable(postingId, locId) {
   // Scroll into view
   const activeRow = tbody.querySelector('.active-row');
   if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+
+// ── Click an operation row ────────────────────────────────────────────────
+function selectOperationFromTable(sweepId, locId) {
+  selectedSweepId = sweepId;
+
+  // Find the first posting at this location belonging to this sweep
+  const feat = map.getSource('dots')._data.features
+    .find(f => f.properties.unique_location_id === locId && f.properties.sweep_event_id === sweepId);
+
+  if (feat) {
+    const postingId = feat.properties.posting_id;
+    const location  = feat.properties.location;
+    selectedPostingId = postingId;
+    const coSweepLocations = getCoSweepLocations(sweepId, location);
+    applyCoSweepHighlights(coSweepLocations);
+    offsetDotsForLocation(locId, sweepId);
+    map.setFilter('dots-selected-ring', ['==', ['get', 'posting_id'], postingId]);
+
+    // Sync active row in postings table
+    const tbody = document.getElementById('sb-tbody');
+    tbody.querySelectorAll('tr').forEach(row => {
+      const isActive = parseInt(row.dataset.postingId) === postingId;
+      row.classList.toggle('active-row', isActive);
+      if (!isActive) {
+        const band = row.dataset.band;
+        row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
+      }
+    });
+    const activePosting = tbody.querySelector('.active-row');
+    if (activePosting) activePosting.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+
+  // Update active row in operations table
+  const opsTbody = document.getElementById('sb-ops-tbody');
+  opsTbody.querySelectorAll('tr').forEach(row => {
+    const isActive = row.dataset.sweepId === sweepId;
+    row.classList.toggle('active-row', isActive);
+    if (!isActive) {
+      const band = row.dataset.band;
+      row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
+    }
+  });
+  const activeOp = opsTbody.querySelector('.active-row');
+  if (activeOp) activeOp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 // ── Close sidebar + reset everything ─────────────────────────────────────
