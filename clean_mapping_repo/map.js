@@ -13,6 +13,7 @@ let selectedSweepId    = null;  // sweep_event_id of clicked dot
 let activeFilter          = 'all';
 let dateFrom              = null;   // YYYY-MM-DD string or null
 let dateTo                = null;   // YYYY-MM-DD string or null
+let sensitivityFilter     = new Set();  // 'High', 'Low', or both
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
@@ -70,6 +71,35 @@ map.on('load', async () => {
 
   const dotsGJ  = await dotsResp.json();
   const linesGJ = await linesResp.json();
+
+  // Build posting_id → sweep properties lookup for patching missing fields
+  const sweepByPostingId = {};
+  linesGJ.features.forEach(f => {
+    parseSweepIds(f.properties.posting_ids).forEach(pid => {
+      if (!sweepByPostingId[pid]) sweepByPostingId[pid] = f.properties;
+    });
+  });
+
+  // Patch dots missing sensitivity_zone or district from the sweep data
+  dotsGJ.features = dotsGJ.features.map(f => {
+    const p = f.properties;
+    if (p.sensitivity_zone && p.district) return f;
+    const sweep = sweepByPostingId[String(p.posting_id)];
+    if (!sweep) return f;
+    const dedup = val => {
+      if (!val) return null;
+      const parts = String(val).split(/[,|]/).map(s => s.trim()).filter(Boolean);
+      return [...new Set(parts)].join(' | ');
+    };
+    return {
+      ...f,
+      properties: {
+        ...p,
+        sensitivity_zone: p.sensitivity_zone || dedup(sweep.sensitivity_zone),
+        district:         p.district         || dedup(sweep.district),
+      },
+    };
+  });
 
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
@@ -461,7 +491,7 @@ function buildSidebar(locId, activePostId, clickedProps) {
   // Meta chips
   document.getElementById('sb-meta').innerHTML = `
     <span class="meta-chip district">${district || '—'}</span>
-    <span class="meta-chip">${sensitivityZone || '—'}</span>
+    <span class="meta-chip">Sensitivity Zone: ${sensitivityZone || '—'}</span>
   `;
 
   // Assign alternating band per sweep event (in order of first appearance)
@@ -495,12 +525,7 @@ function buildSidebar(locId, activePostId, clickedProps) {
     const isActive = p.posting_id === activePostId;
     const start    = formatDate(p.operation_start_date);
     const end      = formatDate(p.operation_end_date);
-    const dateStr  = start === end ? start : `${start} – ${end}`;
     const bandClass = isActive ? 'active-row' : `sweep-band-${sweepBand[sid] ?? 0}`;
-    const stats    = sweepStats[sid];
-    const opDays   = stats && stats.min
-      ? Math.round((stats.max - stats.min) / 86400000) + 1
-      : 1;
 
     return `
       <tr class="${bandClass}"
@@ -508,7 +533,8 @@ function buildSidebar(locId, activePostId, clickedProps) {
           data-band="${sweepBand[sid] ?? 0}"
           onclick="selectPostingFromTable(${p.posting_id}, ${locId})">
         <td class="td-dot-cell"><span class="td-dot" style="background:${interventionColor(p.intervention)};"></span></td>
-        <td class="td-date">${dateStr}</td>
+        <td class="td-date">${start}</td>
+        <td class="td-date">${end}</td>
         <td class="td-intervention">${p.intervention || p.intervention_types || '—'}</td>
       </tr>
     `;
@@ -522,9 +548,8 @@ function buildSidebar(locId, activePostId, clickedProps) {
     const opDays  = stats && stats.min
       ? Math.round((stats.max - stats.min) / 86400000) + 1
       : 1;
-    const dateRange = stats && stats.min
-      ? `${formatDate(stats.min.toISOString())} – ${formatDate(stats.max.toISOString())}`
-      : '—';
+    const startStr = stats && stats.min ? formatDate(stats.min.toISOString()) : '—';
+    const endStr   = stats && stats.max ? formatDate(stats.max.toISOString()) : '—';
     const bandClass = `sweep-band-${i % 2}`;
     return `
       <tr class="${bandClass}"
@@ -532,9 +557,10 @@ function buildSidebar(locId, activePostId, clickedProps) {
           data-band="${i % 2}"
           onclick="selectOperationFromTable('${sid}', ${locId})">
         <td class="td-sweep-id">${sid || '—'}</td>
-        <td class="td-date">${dateRange}</td>
-        <td class="td-oplen">${opDays}d</td>
-        <td class="td-oplen">${stats ? stats.postings : '—'}</td>
+        <td class="td-date">${startStr}</td>
+        <td class="td-date">${endStr}</td>
+        <td class="td-oplen${opDays >= 10 ? ' td-oplen-long' : ''}">${opDays}</td>
+        <td class="td-oplen${stats && stats.postings >= 10 ? ' td-oplen-long' : ''}">${stats ? stats.postings : '—'}</td>
         <td class="td-oplen">${stats ? stats.locs.size : '—'}</td>
       </tr>
     `;
@@ -736,6 +762,11 @@ function buildDotFilter() {
   const mayorFilter = buildMayorFilter();
   if (mayorFilter) parts.push(mayorFilter);
 
+  if (sensitivityFilter.size > 0) {
+    const szParts = [...sensitivityFilter].map(sz => ['in', sz, ['get', 'sensitivity_zone']]);
+    parts.push(szParts.length === 1 ? szParts[0] : ['any', ...szParts]);
+  }
+
   return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
 }
 
@@ -754,12 +785,29 @@ function applyJsFilter(features) {
     if (checked.length < MAYOR_TERMS.length && d) {
       if (!checked.some(m => d >= m.start && d < m.end)) return false;
     }
+    if (sensitivityFilter.size > 0) {
+      const sz = p.sensitivity_zone || '';
+      if (![...sensitivityFilter].some(v => sz.includes(v))) return false;
+    }
     return true;
   });
 }
 
 // ── Mayor checkbox filter ─────────────────────────────────────────────────
 function applyMayorFilter() {
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
+
+// ── Sensitivity zone filter ───────────────────────────────────────────────
+function toggleSensitivityZone(value) {
+  if (sensitivityFilter.has(value)) {
+    sensitivityFilter.delete(value);
+  } else {
+    sensitivityFilter.add(value);
+  }
+  document.getElementById('sz-high').classList.toggle('active', sensitivityFilter.has('High'));
+  document.getElementById('sz-low').classList.toggle('active',  sensitivityFilter.has('Low'));
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
 }
@@ -799,6 +847,9 @@ function resetFilters() {
     const el = document.getElementById(m.id);
     if (el) el.checked = true;
   });
+  sensitivityFilter.clear();
+  document.getElementById('sz-high').classList.remove('active');
+  document.getElementById('sz-low').classList.remove('active');
   setFilter('all');
 }
 
@@ -813,11 +864,10 @@ function interventionColor(intervention) {
 function formatDate(str) {
   if (!str) return '—';
   const d = new Date(str.includes('T') ? str : str + 'T00:00:00');
-  return d.toLocaleDateString('en-US', {
-    month: 'short',
-    day:   'numeric',
-    year:  'numeric',
-  });
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${mm} - ${dd} - ${yyyy}`;
 }
 
 function updateCounts(features) {
@@ -825,4 +875,16 @@ function updateCounts(features) {
   const ops = new Set(features.map(f => f.properties.sweep_event_id).filter(Boolean)).size;
   document.getElementById('dot-count').textContent = Number(postings).toLocaleString();
   document.getElementById('op-count').textContent  = Number(ops).toLocaleString();
+
+  const dates = features
+    .map(f => f.properties.operation_start_date)
+    .filter(Boolean)
+    .map(d => d.slice(0, 10))
+    .sort();
+  if (dates.length) {
+    const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    document.getElementById('date-range').textContent = `${fmt(dates[0])} – ${fmt(dates[dates.length - 1])}`;
+  } else {
+    document.getElementById('date-range').textContent = '—';
+  }
 }

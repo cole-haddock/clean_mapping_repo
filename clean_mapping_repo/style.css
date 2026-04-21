@@ -1,3 +1,11 @@
+/* ── Fonts ──────────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Futura';
+  src: url('data/fonts/futura-bold_BsXRo/Futura Bold/Futura Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
 /* ── Variables ─────────────────────────────────────────────────────────── */
 :root {
   --bg:           #e4e4e4;
@@ -10,8 +18,8 @@
   --accent-orange:#5d0000;
   --accent-yellow:#5d0000;
   --highlight-row:#f9f0f0;
-  --font-mono:    'DM Mono', 'Courier New', monospace;
-  --font-sans:    'DM Sans', 'Helvetica Neue', sans-serif;
+  --font-mono:    'Libre Bodoni', 'Courier New', serif;
+  --font-sans:    'Libre Bodoni', 'Helvetica Neue', serif;
   --sidebar-w:     500px;
   --left-sidebar-w: 340px;
   --header-h:      46px;
@@ -41,19 +49,37 @@ header {
   gap: 20px;
   flex-shrink: 0;
   z-index: 10;
+  position: relative;
 }
 
 .header-title {
+  font-family: 'Futura', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.header-title span {
+  color: var(--accent-red);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.header-byline {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
   white-space: nowrap;
-}
-
-.header-title span {
-  color: var(--accent-red);
 }
 
 .filter-strip {
@@ -103,12 +129,35 @@ header {
   color: #fff;
 }
 
-.filter-counts {
+.counts-center {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--text-dim);
+}
+
+.counts-date {
+  flex: 1;
+  text-align: right;
+  padding-right: 20px;
   white-space: nowrap;
-  margin-left: 6px;
+}
+
+.counts-dot {
+  flex: 0;
+}
+
+.counts-stats {
+  flex: 1;
+  text-align: left;
+  padding-left: 20px;
+  white-space: nowrap;
 }
 
 .reset-btn {
@@ -158,7 +207,7 @@ header {
 }
 
 .sidebar-location {
-  font-family: var(--font-mono);
+  font-family: 'Futura', sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -376,6 +425,11 @@ tbody tr.active-row td {
   white-space: nowrap;
   color: var(--text-muted);
   font-size: 11px;
+}
+
+tbody td.td-oplen-long {
+  outline: 1px solid var(--accent-red);
+  outline-offset: -4px;
 }
 
 .table-section-label {

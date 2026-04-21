@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Oakland Encampment Postings & Sweeps</title>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Bodoni:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
   <link rel="stylesheet" href="style.css" />
@@ -13,20 +14,16 @@
 
   <!-- ── Header ───────────────────────────────────────────────────── -->
   <header>
-    <div class="filter-strip">
-      <span class="filter-label">Filter</span>
-      <button class="filter-btn active" id="btn-all"      onclick="setFilter('all')">All</button>
-      <button class="filter-btn"        id="btn-after"    onclick="setFilter('after')">After Grants Pass</button>
-      <button class="filter-btn before" id="btn-before"   onclick="setFilter('before')">Before Grants Pass</button>
-      <button class="filter-btn"        id="btn-closure"  onclick="setFilter('closure')">Closure</button>
-      <button class="filter-btn"        id="btn-cleaning" onclick="setFilter('cleaning')">Deep Clean</button>
-      <button class="filter-btn reset-btn"                onclick="resetFilters()">Reset</button>
-      <span class="filter-counts">
-        <span id="dot-count">—</span> postings &nbsp;·&nbsp; <span id="op-count">—</span> operations
-      </span>
+    <div class="header-title">Oakland Encampment Closures</div>
+    <div class="counts-center">
+      <span class="counts-date" id="date-range">—</span>
+      <span class="counts-dot">·</span>
+      <span class="counts-stats"><span id="dot-count">—</span> postings &nbsp; <span id="op-count">—</span> operations</span>
     </div>
-    <mapbox-search-box id="search-box"></mapbox-search-box>
-    <div class="header-title">Street Spirit News</div>
+    <div class="header-right">
+      <mapbox-search-box id="search-box"></mapbox-search-box>
+      <div class="header-byline">Street Spirit News</div>
+    </div>
   </header>
 
   <!-- ── Map + Sidebar ────────────────────────────────────────────── -->
@@ -64,6 +61,14 @@
               <div class="ls-toggle-row">
                 <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
                 <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Sensitivity Zone</div>
+              <div class="ls-toggle-row">
+                <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
+                <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
               </div>
             </div>
 
@@ -165,7 +170,8 @@
           <thead>
             <tr>
               <th></th>
-              <th>Date</th>
+              <th>Start Date</th>
+              <th>End Date</th>
               <th>Intervention</th>
             </tr>
           </thead>
@@ -177,8 +183,9 @@
           <thead>
             <tr>
               <th>Sweep</th>
-              <th>Date Range</th>
-              <th>Length</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Length (Days)</th>
               <th>Associated Postings</th>
               <th>Unique Locations</th>
             </tr>

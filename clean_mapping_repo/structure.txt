@@ -6,6 +6,31 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojson
 
+sidebar:
+
+Introduction
+Oral Histories
+Key Analysis
+Methodologies
+
+
+Map filters (drop down arrow)
+  - Time: between X and X
+  - Before Grants Pass and After Grants Pass
+  - Mayors: 
+       - Schaaf
+       - Thao
+       - Fortunato Bas
+       - Jenkins
+       - Lee
+  - Dots on off button
+
+
+About us
+Download this data
+
+
+
 to fix:
 
 - can't click on the lines anymore
@@ -16,6 +41,20 @@ to fix:
 THEN
 - add a left sidebar with all the filters
 
+THEN 
+- make the sweeps with more than 10 days highlight in boxes
+
+THEN
+- add the intro
+
+THEN
+- add the oral histories
+
+THEN 
+- add the wood st layers
+
+THEN
+- change the fonts
 
 
 to fix:
