@@ -61,7 +61,7 @@ map.on('load', async () => {
 
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
-  updateDotCount(allDotFeatures.length);
+  updateCounts(allDotFeatures);
 
   // Build posting_id → geometry location fallback for encoding mismatches
   linesGJ.features.forEach(f => {
@@ -82,14 +82,14 @@ map.on('load', async () => {
     source: 'lines',
     filter: IS_LINE,
     paint: {
-      'line-color': '#b5aeae',
+      'line-color': '#343131',
       'line-width': [
         'interpolate', ['linear'], ['zoom'],
         10, 1.5,
         14, 3,
         16, 5,
       ],
-      'line-opacity': 0.7,
+      'line-opacity': 0.45,
     },
   });
 
@@ -136,9 +136,9 @@ map.on('load', async () => {
     source: 'lines',
     filter: IS_POLY,
     paint: {
-      'fill-color': '#b5aeae',
-      'fill-opacity': 0.4,
-      'fill-outline-color': '#b5aeae',
+      'fill-color': '#343131',
+      'fill-opacity': 0.2,
+      'fill-outline-color': '#343131',
     },
   });
 
@@ -188,9 +188,11 @@ map.on('load', async () => {
         '#6b6464',
       ],
       'circle-opacity': 0.7,
+      'circle-opacity-transition': { duration: 250, delay: 0 },
       'circle-stroke-width': ['case', ['boolean', ['get', 'is_clicked'], false], 1.5, 0],
       'circle-stroke-color': '#ffffff',
       'circle-stroke-opacity': 0.85,
+      'circle-stroke-opacity-transition': { duration: 250, delay: 0 },
     },
   });
 
@@ -210,6 +212,7 @@ map.on('load', async () => {
       'circle-stroke-width': 2.5,
       'circle-stroke-color': '#ac0000',
       'circle-opacity': 0,
+      'circle-stroke-opacity-transition': { duration: 250, delay: 0 },
     },
     filter: ['==', ['get', 'posting_id'], -1],  // hidden by default
   });
@@ -644,6 +647,19 @@ function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
 }
 
+function toggleLegend() {
+  document.getElementById('legend').classList.toggle('collapsed');
+}
+
+function toggleLeftSidebar() {
+  document.getElementById('left-sidebar').classList.toggle('open');
+}
+
+function toggleFiltersPanel() {
+  document.getElementById('filters-body').classList.toggle('closed');
+  document.getElementById('filters-chevron').classList.toggle('closed');
+}
+
 function toggleFocusMode() {
   focusMode = !focusMode;
   const btn = document.getElementById('btn-focus');
@@ -697,14 +713,21 @@ function setFilter(type) {
 
   map.setFilter('dots-layer', expr);
 
-  // Update count display
-  // querySourceFeatures is approximate at current zoom — use full feature list for 'all'
-  if (expr === null) {
-    updateDotCount(allDotFeatures.length);
-  } else {
-    const visible = map.querySourceFeatures('dots', { filter: expr });
-    updateDotCount(visible.length);
-  }
+  const filtered = expr === null
+    ? allDotFeatures
+    : allDotFeatures.filter(f => {
+        const p = f.properties;
+        if (activeFilter === 'after')   return p.before_after_grants_pass === 'After';
+        if (activeFilter === 'before')  return p.before_after_grants_pass === 'Before';
+        if (activeFilter === 'closure') return p.intervention && p.intervention.toLowerCase().includes('closure');
+        if (activeFilter === 'cleaning') return p.intervention && p.intervention.includes('Deep Cleaning');
+        return true;
+      });
+  updateCounts(filtered);
+}
+
+function resetFilters() {
+  setFilter('all');
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -725,7 +748,9 @@ function formatDate(str) {
   });
 }
 
-function updateDotCount(n) {
-  document.getElementById('dot-count').textContent =
-    `${Number(n).toLocaleString()} postings`;
+function updateCounts(features) {
+  const postings = features.length;
+  const ops = new Set(features.map(f => f.properties.sweep_event_id).filter(Boolean)).size;
+  document.getElementById('dot-count').textContent = Number(postings).toLocaleString();
+  document.getElementById('op-count').textContent  = Number(ops).toLocaleString();
 }

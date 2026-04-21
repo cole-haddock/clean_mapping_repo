@@ -13,7 +13,6 @@
 
   <!-- ── Header ───────────────────────────────────────────────────── -->
   <header>
-    <div class="header-title">Oakland <span>//</span> Encampment Enforcement</div>
     <div class="filter-strip">
       <span class="filter-label">Filter</span>
       <button class="filter-btn active" id="btn-all"      onclick="setFilter('all')">All</button>
@@ -21,14 +20,119 @@
       <button class="filter-btn before" id="btn-before"   onclick="setFilter('before')">Before GP</button>
       <button class="filter-btn"        id="btn-closure"  onclick="setFilter('closure')">Closure</button>
       <button class="filter-btn"        id="btn-cleaning" onclick="setFilter('cleaning')">Deep Clean</button>
+      <button class="filter-btn reset-btn"                onclick="resetFilters()">Reset</button>
+      <span class="filter-counts">
+        <span id="dot-count">—</span> postings &nbsp;·&nbsp; <span id="op-count">—</span> operations
+      </span>
     </div>
-    <div class="dot-count" id="dot-count">— postings</div>
     <mapbox-search-box id="search-box"></mapbox-search-box>
+    <div class="header-title">Street Spirit News</div>
   </header>
 
   <!-- ── Map + Sidebar ────────────────────────────────────────────── -->
   <div class="map-wrap">
     <div id="map"></div>
+
+    <!-- Left Sidebar -->
+    <div id="left-sidebar" class="open">
+      <div class="left-sidebar-inner">
+
+        <button class="ls-nav-btn">Introduction</button>
+        <button class="ls-nav-btn">Oral Histories</button>
+        <button class="ls-nav-btn">Key Analysis</button>
+        <button class="ls-nav-btn">Methodologies</button>
+
+        <div class="ls-divider"></div>
+
+        <div class="ls-section">
+          <button class="ls-section-header" onclick="toggleFiltersPanel()">
+            Map Filters <span class="ls-chevron" id="filters-chevron">▼</span>
+          </button>
+          <div class="ls-section-body" id="filters-body">
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Time Range</div>
+              <div class="ls-time-inputs">
+                <input class="ls-date-input" type="text" placeholder="From" />
+                <span class="ls-date-sep">–</span>
+                <input class="ls-date-input" type="text" placeholder="To" />
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Grants Pass</div>
+              <div class="ls-toggle-row">
+                <button class="ls-toggle-btn" id="gp-before">Before</button>
+                <button class="ls-toggle-btn" id="gp-after">After</button>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Mayor</div>
+              <table class="ls-mayor-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Mayor</th>
+                    <th>Start</th>
+                    <th>End</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><input type="checkbox" checked /></td>
+                    <td>Schaaf</td>
+                    <td>Jan '15</td>
+                    <td>Jan '23</td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" checked /></td>
+                    <td>Thao</td>
+                    <td>Jan '23</td>
+                    <td>Dec '24</td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" checked /></td>
+                    <td>Fortunato Bas</td>
+                    <td>Dec '24</td>
+                    <td>Jan '25</td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" checked /></td>
+                    <td>Jenkins</td>
+                    <td>Jan '25</td>
+                    <td>May '25</td>
+                  </tr>
+                  <tr>
+                    <td><input type="checkbox" checked /></td>
+                    <td>Lee</td>
+                    <td>May '25</td>
+                    <td>Present</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <button class="ls-reset-btn" onclick="resetFilters()">Reset Filters</button>
+
+          </div>
+        </div>
+
+        <div class="ls-divider"></div>
+
+        <button class="ls-nav-btn">About Us</button>
+        <button class="ls-nav-btn">Download This Data</button>
+
+      </div>
+
+      <div class="left-sidebar-footer">
+        <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">Dots Off</button>
+      </div>
+
+      <button class="left-sidebar-toggle" onclick="toggleLeftSidebar()">
+        <span class="left-toggle-arrow">◀</span>
+      </button>
+    </div>
 
     <!-- Sidebar -->
     <div id="sidebar">
@@ -83,34 +187,37 @@
     <!-- Oral History Button -->
     <a class="oral-history-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSffifZMZL6kkHMTVJLlKq2mVQRgCYWXfK87klzgFxLQYEogQw/viewform?usp=dialog" target="_blank" rel="noopener">Submit Oral Histories</a>
 
-    <!-- Focus Mode Toggle -->
-    <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">Dots Off</button>
 
     <!-- Legend -->
-    <div id="legend">
-      <div class="legend-row">
-        <div class="legend-dot" style="background:#ac0000;"></div>
-        Selected location
+    <div id="legend" class="collapsed" onclick="toggleLegend()">
+      <div class="legend-header">
+        Legend <span class="legend-chevron">▲</span>
       </div>
-      <div class="legend-row">
-        <div class="legend-line" style="background:#5d0000;"></div>
-        Co-sweep locations
-      </div>
-      <div class="legend-row">
-        <div class="legend-swatch" style="background:#b5aeae;"></div>
-        Polygon area
-      </div>
-      <div class="legend-row">
-        <div class="legend-dot" style="background:#ac0000;"></div>
-        Closure
-      </div>
-      <div class="legend-row">
-        <div class="legend-dot" style="background:#5c2d6e;"></div>
-        Deep Cleaning
-      </div>
-      <div class="legend-row">
-        <div class="legend-dot" style="background:#6b6464;"></div>
-        Other
+      <div class="legend-body">
+        <div class="legend-row">
+          <div class="legend-swatch" style="background:#5d0000; opacity:1;"></div>
+          Selected location
+        </div>
+        <div class="legend-row">
+          <div class="legend-swatch" style="background:#ac0000; opacity:0.85;"></div>
+          Co-swept locations
+        </div>
+        <div class="legend-row">
+          <div class="legend-swatch" style="background:#343131; opacity:0.35;"></div>
+          Swept area
+        </div>
+        <div class="legend-row">
+          <div class="legend-dot" style="background:#ac0000;"></div>
+          Closure
+        </div>
+        <div class="legend-row">
+          <div class="legend-dot" style="background:#5c2d6e;"></div>
+          Deep Cleaning
+        </div>
+        <div class="legend-row">
+          <div class="legend-dot" style="background:#6b6464;"></div>
+          Other
+        </div>
       </div>
     </div>
   </div>
