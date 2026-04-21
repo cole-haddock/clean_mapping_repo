@@ -525,10 +525,12 @@ function buildSidebar(locId, activePostId, clickedProps) {
     `;
   }).join('');
 
-  // Scroll active row into view
+  // Scroll active posting into view and sync ops table
   setTimeout(() => {
     const activeRow = tbody.querySelector('.active-row');
     if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    const activeFeat = features.find(f => f.properties.posting_id === activePostId);
+    if (activeFeat) setActiveOpRow(activeFeat.properties.sweep_event_id);
   }, 50);
 }
 
@@ -553,7 +555,7 @@ function selectPostingFromTable(postingId, locId) {
     '==', ['get', 'posting_id'], postingId
   ]);
 
-  // Update active row in table, restoring band class on deactivated rows
+  // Update active row in postings table
   const tbody = document.getElementById('sb-tbody');
   tbody.querySelectorAll('tr').forEach(row => {
     const isActive = parseInt(row.dataset.postingId) === postingId;
@@ -563,10 +565,11 @@ function selectPostingFromTable(postingId, locId) {
       row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
     }
   });
-
-  // Scroll into view
   const activeRow = tbody.querySelector('.active-row');
   if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  // Sync active row in operations table to match this posting's sweep
+  if (selectedSweepId) setActiveOpRow(selectedSweepId);
 }
 
 // ── Click an operation row ────────────────────────────────────────────────
@@ -600,10 +603,14 @@ function selectOperationFromTable(sweepId, locId) {
     if (activePosting) activePosting.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 
-  // Update active row in operations table
+  setActiveOpRow(sweepId);
+}
+
+function setActiveOpRow(sweepId) {
   const opsTbody = document.getElementById('sb-ops-tbody');
+  if (!opsTbody) return;
   opsTbody.querySelectorAll('tr').forEach(row => {
-    const isActive = row.dataset.sweepId === sweepId;
+    const isActive = row.dataset.sweepId === String(sweepId);
     row.classList.toggle('active-row', isActive);
     if (!isActive) {
       const band = row.dataset.band;

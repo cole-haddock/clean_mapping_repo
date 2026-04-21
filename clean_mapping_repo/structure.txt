@@ -6,6 +6,17 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojson
 
+to fix:
+
+- can't click on the lines anymore
+- the polygons - you can click on them but the sidebar doesn't appear
+- need to be able to select operations from the sidebar like you can postings
+- the unselected areas need to be darker
+
+THEN
+- add a left sidebar with all the filters
+
+
 
 to fix:
 
