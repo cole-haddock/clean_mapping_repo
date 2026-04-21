@@ -14,6 +14,7 @@ let activeFilter          = 'all';
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
+let geomByLocation        = {};    // location string → geometry feature (for district/zone fallback)
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -229,9 +230,9 @@ map.on('load', async () => {
   ['lines-base', 'polygons-base'].forEach(layer => {
     map.on('click', layer, e => {
       e.preventDefault();
-      // If a dot is at this point, let the dot handler take precedence
+      // If a visible dot is at this point, let the dot handler take precedence
       const dotsHere = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
-      if (dotsHere.length > 0) return;
+      if (!focusMode && dotsHere.length > 0) return;
 
       // Pick the smallest polygon/line at this point by bounding box area
       const hits = map.queryRenderedFeatures(e.point, { layers: ['lines-base', 'polygons-base'] });
@@ -413,6 +414,19 @@ function buildSidebar(locId, activePostId, clickedProps) {
 
   const uniqueOps = new Set(features.map(f => f.properties.sweep_event_id)).size;
 
+  // Fall back to geometry feature for district/sensitivity_zone if dot is missing them
+  let district        = clickedProps.district;
+  let sensitivityZone = clickedProps.sensitivity_zone;
+  if (!district || !sensitivityZone) {
+    const geomLoc  = postingIdToGeomLoc[String(clickedProps.posting_id)] || clickedProps.location;
+    const geomFeat = map.getSource('lines')._data.features.find(f => f.properties.location === geomLoc);
+    if (geomFeat) {
+      const dedup = val => val ? [...new Set(val.split(',').map(s => s.trim()))].join(', ') : null;
+      district        = district        || dedup(geomFeat.properties.district);
+      sensitivityZone = sensitivityZone || dedup(geomFeat.properties.sensitivity_zone);
+    }
+  }
+
   // Location header
   document.getElementById('sb-location').textContent = clickedProps.location;
   document.getElementById('sb-count').textContent    = features.length;
@@ -420,8 +434,8 @@ function buildSidebar(locId, activePostId, clickedProps) {
 
   // Meta chips
   document.getElementById('sb-meta').innerHTML = `
-    <span class="meta-chip district">${clickedProps.district || '—'}</span>
-    <span class="meta-chip">${clickedProps.sensitivity_zone || '—'}</span>
+    <span class="meta-chip district">${district || '—'}</span>
+    <span class="meta-chip">${sensitivityZone || '—'}</span>
   `;
 
   // Assign alternating band per sweep event (in order of first appearance)

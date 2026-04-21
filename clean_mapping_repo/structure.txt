@@ -6,4 +6,44 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojson
 
+
+to fix:
+
+- the overlapping lake merrit circles
+- the sweep codes being wrong now
+- the orange doesn't turn off when you go to other ones
+- black outline around the posting do
+- colors correspond to the intervention type, not GP
+- the side bar doesn't come out far enough
+- there is no "look at all data" button
+- add a district layer
+- the bp and ap color labels on the dots
+- make the sidebar rows alternating for the same sweep
+-can't click under the polygon 
+
+
+
+for tomorrow:
+
+- some of the sweeps didn't transfer right
+- the interactivity is bad
+- try again. 
+
+What I need to change:
+
+Map interaction:
+
+- the color of the polygons
+- You should be able to click on the polygon and it highlights 
+  the postings that have happened there
+- make the edges of the polygons blurry so they blend better
+- change the color of the posting dots: clicked = black, the other 
+ones from the same date: gray
+- make them all the same color 
+- the sweep interaction with the regular ones
+- for the overlapping ones- the one on top takes priority
+- the grey scale looks ugly - different mapbox map?
+- change the orange to big shaded areas
+
+
     
