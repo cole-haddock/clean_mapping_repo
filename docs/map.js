@@ -285,9 +285,9 @@ map.on('load', async () => {
       ],
       'circle-color': [
         'case',
-        ['in', 'Closure', ['get', 'intervention']], '#ac0000',
-        ['in', 'Deep Clean', ['get', 'intervention']], '#5c2d6e',
-        '#6b6464',
+        ['==', ['get', 'intervention'], 'Closure'], '#ac0000',
+        ['==', ['get', 'intervention'], 'Deep Cleaning'], '#5c2d6e',
+        '#4a5568',
       ],
       'circle-opacity': 0.7,
       'circle-opacity-transition': { duration: 250, delay: 0 },
@@ -632,7 +632,6 @@ function buildSidebar(locId, activePostId, clickedProps) {
   // Scroll active posting into view and sync ops table
   setTimeout(() => {
     const activeRow = tbody.querySelector('.active-row');
-    if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     const activeFeat = features.find(f => f.properties.posting_id === activePostId);
     if (activeFeat) setActiveOpRow(activeFeat.properties.sweep_event_id);
   }, 50);
@@ -670,7 +669,6 @@ function selectPostingFromTable(postingId, locId) {
     }
   });
   const activeRow = tbody.querySelector('.active-row');
-  if (activeRow) activeRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
   // Sync active row in operations table to match this posting's sweep
   if (selectedSweepId) setActiveOpRow(selectedSweepId);
@@ -703,8 +701,6 @@ function selectOperationFromTable(sweepId, locId) {
         row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
       }
     });
-    const activePosting = tbody.querySelector('.active-row');
-    if (activePosting) activePosting.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }
 
   setActiveOpRow(sweepId);
@@ -721,8 +717,6 @@ function setActiveOpRow(sweepId) {
       row.className = band ? `sweep-band-${band}` : 'sweep-band-0';
     }
   });
-  const activeOp = opsTbody.querySelector('.active-row');
-  if (activeOp) activeOp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 }
 
 // ── Close sidebar + reset everything ─────────────────────────────────────
@@ -821,8 +815,8 @@ function buildDotFilter() {
   switch (activeFilter) {
     case 'after':  parts.push(['>=', ['slice', ['get', 'operation_start_date'], 0, 10], GP_DATE]); break;
     case 'before': parts.push(['<',  ['slice', ['get', 'operation_start_date'], 0, 10], GP_DATE]); break;
-    case 'closure':  parts.push(['in', 'Closure', ['downcase', ['get', 'intervention']]]); break;
-    case 'cleaning': parts.push(['in', 'Deep Cleaning', ['get', 'intervention']]); break;
+    case 'closure':  parts.push(['==', ['get', 'intervention'], 'Closure']); break;
+    case 'cleaning': parts.push(['==', ['get', 'intervention'], 'Deep Cleaning']); break;
   }
 
   if (dateFrom) parts.push(['>=', ['slice', ['get', 'operation_start_date'], 0, 10], dateFrom]);
@@ -843,11 +837,11 @@ function buildDotFilter() {
 
   if (interventionFilter.size > 0) {
     const ivParts = [];
-    if (interventionFilter.has('closure'))  ivParts.push(['in', 'Closure',    ['get', 'intervention']]);
-    if (interventionFilter.has('cleaning')) ivParts.push(['in', 'Deep Clean', ['get', 'intervention']]);
+    if (interventionFilter.has('closure'))  ivParts.push(['==', ['get', 'intervention'], 'Closure']);
+    if (interventionFilter.has('cleaning')) ivParts.push(['==', ['get', 'intervention'], 'Deep Cleaning']);
     if (interventionFilter.has('other'))    ivParts.push(['all',
-      ['!', ['in', 'Closure',    ['get', 'intervention']]],
-      ['!', ['in', 'Deep Clean', ['get', 'intervention']]],
+      ['!=', ['get', 'intervention'], 'Closure'],
+      ['!=', ['get', 'intervention'], 'Deep Cleaning'],
     ]);
     parts.push(ivParts.length === 1 ? ivParts[0] : ['any', ...ivParts]);
   }
@@ -862,8 +856,8 @@ function applyJsFilter(features) {
     const d = p.operation_start_date ? p.operation_start_date.slice(0, 10) : null;
     if (activeFilter === 'after'   && (!d || d <  GP_DATE)) return false;
     if (activeFilter === 'before'  && (!d || d >= GP_DATE)) return false;
-    if (activeFilter === 'closure' && !(p.intervention && p.intervention.toLowerCase().includes('closure'))) return false;
-    if (activeFilter === 'cleaning'&& !(p.intervention && p.intervention.includes('Deep Cleaning')))        return false;
+    if (activeFilter === 'closure'  && p.intervention !== 'Closure')       return false;
+    if (activeFilter === 'cleaning' && p.intervention !== 'Deep Cleaning') return false;
     if (dateFrom && d && d < dateFrom) return false;
     if (dateTo   && d && d > dateTo)   return false;
     const checked = getCheckedMayors();
@@ -880,8 +874,8 @@ function applyJsFilter(features) {
     }
     if (interventionFilter.size > 0) {
       const iv = p.intervention || '';
-      const isClosure  = iv.includes('Closure');
-      const isCleaning = iv.includes('Deep Clean');
+      const isClosure  = iv === 'Closure';
+      const isCleaning = iv === 'Deep Cleaning';
       const isOther    = !isClosure && !isCleaning;
       const match =
         (interventionFilter.has('closure')  && isClosure)  ||
@@ -991,7 +985,7 @@ function resetFilters() {
   districtFilter.clear();
   [1, 2, 3, 4, 5, 6, 7].forEach(n => {
     const el = document.getElementById(`district-${n}`);
-    if (el) el.checked = true;
+    if (el) el.checked = false;
   });
   map.setFilter('districts-fill',           ['==', ['get', 'name'], '!!NOMATCH!!']);
   map.setFilter('districts-active-outline', ['==', ['get', 'name'], '!!NOMATCH!!']);
@@ -1004,10 +998,9 @@ function resetFilters() {
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 function interventionColor(intervention) {
-  if (!intervention) return '#6b6464';
-  if (intervention.includes('Closure'))    return '#ac0000';
-  if (intervention.includes('Deep Clean')) return '#5c2d6e';
-  return '#6b6464';
+  if (intervention === 'Closure')      return '#ac0000';
+  if (intervention === 'Deep Cleaning') return '#5c2d6e';
+  return '#4a5568';
 }
 
 function formatDate(str) {
