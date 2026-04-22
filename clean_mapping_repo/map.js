@@ -3,8 +3,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiY29sZS1oYWRkb2NrIiwiYSI6ImNtbWtxbWRzaTF0ZWEyc
 
 const STYLE_URL = 'mapbox://styles/mapbox/light-v11';  // swap for your custom style later
 
-const DOTS_URL  = 'data/all_posting_dots_corrected.geojson';
-const LINES_URL = 'data/combined_verified_sweeps.geojson';
+const DOTS_URL      = 'data/all_posting_dots_corrected.geojson';
+const LINES_URL     = 'data/combined_verified_sweeps.geojson';
+const DISTRICTS_URL = 'data/CouncilDistrict_20260422.geojson';
+const CITY_URL      = 'data/City_Limits_20260422.geojson';
 
 // ── State ─────────────────────────────────────────────────────────────────
 let selectedLocationId = null;  // unique_location_id of clicked dot's location
@@ -14,6 +16,7 @@ let activeFilter          = 'all';
 let dateFrom              = null;   // YYYY-MM-DD string or null
 let dateTo                = null;   // YYYY-MM-DD string or null
 let sensitivityFilter     = new Set();  // 'High', 'Low', or both
+let districtFilter        = new Set();  // '1'–'7', empty = all
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
@@ -63,14 +66,18 @@ window.addEventListener('load', () => {
 // ── Load data and build layers ────────────────────────────────────────────
 map.on('load', async () => {
 
-  // Fetch both files in parallel
-  const [dotsResp, linesResp] = await Promise.all([
+  // Fetch all files in parallel
+  const [dotsResp, linesResp, districtsResp, cityResp] = await Promise.all([
     fetch(DOTS_URL),
     fetch(LINES_URL),
+    fetch(DISTRICTS_URL),
+    fetch(CITY_URL),
   ]);
 
-  const dotsGJ  = await dotsResp.json();
-  const linesGJ = await linesResp.json();
+  const dotsGJ      = await dotsResp.json();
+  const linesGJ     = await linesResp.json();
+  const districtsGJ = await districtsResp.json();
+  const cityGJ      = await cityResp.json();
 
   // Build posting_id → sweep properties lookup for patching missing fields
   const sweepByPostingId = {};
@@ -114,8 +121,59 @@ map.on('load', async () => {
   });
 
   // ── Sources ────────────────────────────────────────────────────────────
-  map.addSource('lines', { type: 'geojson', data: linesGJ });
-  map.addSource('dots',  { type: 'geojson', data: dotsGJ  });
+  map.addSource('city',      { type: 'geojson', data: cityGJ      });
+  map.addSource('districts', { type: 'geojson', data: districtsGJ });
+  map.addSource('lines',     { type: 'geojson', data: linesGJ });
+  map.addSource('dots',      { type: 'geojson', data: dotsGJ  });
+
+  // ── City boundary — dark outer border ────────────────────────────────
+  map.addLayer({
+    id: 'city-boundary',
+    type: 'line',
+    source: 'city',
+    paint: {
+      'line-color': '#888080',
+      'line-width': 2,
+      'line-opacity': 0.55,
+    },
+  });
+
+  // ── District outline — subtle border, always visible ──────────────────
+  map.addLayer({
+    id: 'districts-outline',
+    type: 'line',
+    source: 'districts',
+    paint: {
+      'line-color': '#888080',
+      'line-width': 1.5,
+      'line-opacity': 0.3,
+    },
+  });
+
+  // ── District fill — highlights active districts, hidden by default ─────
+  map.addLayer({
+    id: 'districts-fill',
+    type: 'fill',
+    source: 'districts',
+    filter: ['==', ['get', 'name'], '!!NOMATCH!!'],
+    paint: {
+      'fill-color': '#ac0000',
+      'fill-opacity': 0.08,
+    },
+  });
+
+  // ── District active outline — stronger border for highlighted districts ─
+  map.addLayer({
+    id: 'districts-active-outline',
+    type: 'line',
+    source: 'districts',
+    filter: ['==', ['get', 'name'], '!!NOMATCH!!'],
+    paint: {
+      'line-color': '#ac0000',
+      'line-width': 2,
+      'line-opacity': 0.6,
+    },
+  });
 
   // ── LAYER 1: Base line segments — light gray, always visible ───────────
   map.addLayer({
@@ -703,6 +761,11 @@ function toggleMayorsPanel() {
   document.getElementById('mayors-chevron').classList.toggle('closed');
 }
 
+function toggleDistrictsPanel() {
+  document.getElementById('districts-body').classList.toggle('closed');
+  document.getElementById('districts-chevron').classList.toggle('closed');
+}
+
 function toggleFocusMode() {
   focusMode = !focusMode;
   const btn = document.getElementById('btn-focus');
@@ -767,6 +830,11 @@ function buildDotFilter() {
     parts.push(szParts.length === 1 ? szParts[0] : ['any', ...szParts]);
   }
 
+  if (districtFilter.size > 0) {
+    const dParts = [...districtFilter].map(d => ['in', d, ['get', 'district']]);
+    parts.push(dParts.length === 1 ? dParts[0] : ['any', ...dParts]);
+  }
+
   return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
 }
 
@@ -789,12 +857,40 @@ function applyJsFilter(features) {
       const sz = p.sensitivity_zone || '';
       if (![...sensitivityFilter].some(v => sz.includes(v))) return false;
     }
+    if (districtFilter.size > 0) {
+      const dist = p.district || '';
+      if (![...districtFilter].some(v => dist.includes(v))) return false;
+    }
     return true;
   });
 }
 
 // ── Mayor checkbox filter ─────────────────────────────────────────────────
 function applyMayorFilter() {
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
+
+// ── Council district checkbox filter ─────────────────────────────────────
+function applyDistrictFilter() {
+  districtFilter.clear();
+  [1, 2, 3, 4, 5, 6, 7].forEach(n => {
+    const el = document.getElementById(`district-${n}`);
+    if (el && el.checked) districtFilter.add(String(n));
+  });
+  if (districtFilter.size === 7) districtFilter.clear();  // all checked = no filter
+
+  // Sync district highlight layers
+  if (districtFilter.size > 0) {
+    const ccdNames = [...districtFilter].map(n => `CCD${n}`);
+    const f = ['in', ['get', 'name'], ['literal', ccdNames]];
+    map.setFilter('districts-fill',          f);
+    map.setFilter('districts-active-outline', f);
+  } else {
+    map.setFilter('districts-fill',          ['==', ['get', 'name'], '!!NOMATCH!!']);
+    map.setFilter('districts-active-outline', ['==', ['get', 'name'], '!!NOMATCH!!']);
+  }
+
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
 }
@@ -814,14 +910,14 @@ function toggleSensitivityZone(value) {
 
 // ── Filter buttons ────────────────────────────────────────────────────────
 function setFilter(type) {
-  activeFilter = type;
+  activeFilter = (activeFilter === type) ? 'all' : type;
 
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById(`btn-${type}`);
   if (btn) btn.classList.add('active');
 
-  document.getElementById('gp-before').classList.toggle('active', type === 'before');
-  document.getElementById('gp-after').classList.toggle('active', type === 'after');
+  document.getElementById('gp-before').classList.toggle('active', activeFilter === 'before');
+  document.getElementById('gp-after').classList.toggle('active', activeFilter === 'after');
 
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
@@ -850,6 +946,13 @@ function resetFilters() {
   sensitivityFilter.clear();
   document.getElementById('sz-high').classList.remove('active');
   document.getElementById('sz-low').classList.remove('active');
+  districtFilter.clear();
+  [1, 2, 3, 4, 5, 6, 7].forEach(n => {
+    const el = document.getElementById(`district-${n}`);
+    if (el) el.checked = true;
+  });
+  map.setFilter('districts-fill',           ['==', ['get', 'name'], '!!NOMATCH!!']);
+  map.setFilter('districts-active-outline', ['==', ['get', 'name'], '!!NOMATCH!!']);
   setFilter('all');
 }
 

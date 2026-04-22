@@ -54,7 +54,7 @@ header {
 
 .header-title {
   font-family: 'Futura', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -75,7 +75,7 @@ header {
 
 .header-byline {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -138,8 +138,8 @@ header {
   justify-content: center;
   pointer-events: none;
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-dim);
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
 .counts-date {
@@ -549,9 +549,9 @@ tbody td.td-oplen-long {
   text-align: left;
   background: none;
   border: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: 'Futura', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -577,9 +577,9 @@ tbody td.td-oplen-long {
   width: 100%;
   background: none;
   border: none;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
+  font-family: 'Futura', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -602,18 +602,33 @@ tbody td.td-oplen-long {
   transition: max-height 0.25s ease;
 }
 
+#filters-body {
+  max-height: 1200px;
+}
+
+#filters-body.closed {
+  max-height: 0;
+}
+
 .ls-section-body.closed { max-height: 0; }
 
 /* Filter groups */
-.ls-filter-group { margin: 12px 4px; }
+.ls-filter-group {
+  margin: 24px 4px 0;
+  padding-bottom: 24px;
+  padding-left: 10px;
+}
 
 .ls-filter-label {
   font-family: var(--font-mono);
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
-  margin-bottom: 7px;
+  padding-bottom: 7px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--panel-border);
 }
 
 /* Time range */
@@ -675,13 +690,14 @@ tbody td.td-oplen-long {
   width: 100%;
   background: none;
   border: none;
-  border-bottom: 1px solid var(--panel-border);
   font-family: var(--font-mono);
   font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
   padding: 0 4px 7px;
+  border-bottom: 1px solid var(--panel-border);
   cursor: pointer;
 }
 
@@ -747,7 +763,7 @@ tbody td.td-oplen-long {
 .ls-reset-btn {
   display: block;
   width: 100%;
-  margin-top: 14px;
+  margin-top: 36px;
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.08em;

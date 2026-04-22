@@ -18,7 +18,7 @@
     <div class="counts-center">
       <span class="counts-date" id="date-range">—</span>
       <span class="counts-dot">·</span>
-      <span class="counts-stats"><span id="dot-count">—</span> postings &nbsp; <span id="op-count">—</span> operations</span>
+      <span class="counts-stats"><span id="dot-count">—</span> postings &nbsp;/&nbsp; <span id="op-count">—</span> operations</span>
     </div>
     <div class="header-right">
       <mapbox-search-box id="search-box"></mapbox-search-box>
@@ -61,14 +61,6 @@
               <div class="ls-toggle-row">
                 <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
                 <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Sensitivity Zone</div>
-              <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
-                <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
               </div>
             </div>
 
@@ -121,6 +113,40 @@
                 </table>
               </div>
             </div>
+
+            <div class="ls-filter-group">
+              <button class="ls-mayor-header" onclick="toggleDistrictsPanel()">
+                Council Districts <span class="ls-chevron" id="districts-chevron">▼</span>
+              </button>
+              <div class="ls-section-body closed" id="districts-body">
+                <table class="ls-mayor-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>District</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><input type="checkbox" id="district-1" checked onchange="applyDistrictFilter()" /></td><td>District 1</td></tr>
+                    <tr><td><input type="checkbox" id="district-2" checked onchange="applyDistrictFilter()" /></td><td>District 2</td></tr>
+                    <tr><td><input type="checkbox" id="district-3" checked onchange="applyDistrictFilter()" /></td><td>District 3</td></tr>
+                    <tr><td><input type="checkbox" id="district-4" checked onchange="applyDistrictFilter()" /></td><td>District 4</td></tr>
+                    <tr><td><input type="checkbox" id="district-5" checked onchange="applyDistrictFilter()" /></td><td>District 5</td></tr>
+                    <tr><td><input type="checkbox" id="district-6" checked onchange="applyDistrictFilter()" /></td><td>District 6</td></tr>
+                    <tr><td><input type="checkbox" id="district-7" checked onchange="applyDistrictFilter()" /></td><td>District 7</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Sensitivity Zone</div>
+              <div class="ls-toggle-row">
+                <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
+                <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
+              </div>
+            </div>
+
 
             <button class="ls-reset-btn" onclick="resetFilters()">Reset Filters</button>
 
