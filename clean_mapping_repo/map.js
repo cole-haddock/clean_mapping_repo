@@ -17,6 +17,7 @@ let dateFrom              = null;   // YYYY-MM-DD string or null
 let dateTo                = null;   // YYYY-MM-DD string or null
 let sensitivityFilter     = new Set();  // 'High', 'Low', or both
 let districtFilter        = new Set();  // '1'–'7', empty = all
+let interventionFilter    = new Set();  // 'closure', 'cleaning', 'other', empty = all
 let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
@@ -402,15 +403,17 @@ function handleDotClick(props) {
     '==', ['get', 'posting_id'], postId
   ]);
 
-  // 4. Offset dots at this location + co-sweep locations to clicked positions
-  offsetDotsForLocation(locId, sweepId);
-
-  // 5. Hide dots if focus mode is on
+  // 4. Hide dots if focus mode is on — do this before any setData to avoid flash
   if (focusMode) hideDots(); else showDots();
+
+  // 5. Offset dots only when visible — setData causes a one-frame flash at defined opacity
+  if (!focusMode) offsetDotsForLocation(locId, sweepId);
 
   // 6. Build and open sidebar
   buildSidebar(locId, postId, props);
-  document.getElementById('sidebar').classList.add('open');
+  requestAnimationFrame(() => {
+    document.getElementById('sidebar').classList.add('open');
+  });
 }
 
 // ── Get co-sweep location names for a given sweep event ───────────────────
@@ -648,7 +651,7 @@ function selectPostingFromTable(postingId, locId) {
     selectedSweepId = sweepId;
     const coSweepLocations = getCoSweepLocations(sweepId, location);
     applyCoSweepHighlights(coSweepLocations);
-    offsetDotsForLocation(locId, sweepId);
+    if (!focusMode) offsetDotsForLocation(locId, sweepId);
   }
 
   // Move ring to this dot
@@ -687,7 +690,7 @@ function selectOperationFromTable(sweepId, locId) {
     selectedPostingId = postingId;
     const coSweepLocations = getCoSweepLocations(sweepId, location);
     applyCoSweepHighlights(coSweepLocations);
-    offsetDotsForLocation(locId, sweepId);
+    if (!focusMode) offsetDotsForLocation(locId, sweepId);
     map.setFilter('dots-selected-ring', ['==', ['get', 'posting_id'], postingId]);
 
     // Sync active row in postings table
@@ -773,9 +776,10 @@ function toggleFocusMode() {
   const btn = document.getElementById('btn-focus');
   btn.classList.toggle('active', focusMode);
   btn.textContent = focusMode ? 'Dots Off' : 'Dots On';
-  // If toggling off while a location is selected, restore dots
-  if (!focusMode) showDots();
-  // If toggling on while a location is selected, hide dots
+  if (!focusMode) {
+    showDots();
+    if (selectedLocationId !== null) offsetDotsForLocation(selectedLocationId, selectedSweepId);
+  }
   if (focusMode && selectedLocationId) hideDots();
 }
 
@@ -837,6 +841,17 @@ function buildDotFilter() {
     parts.push(dParts.length === 1 ? dParts[0] : ['any', ...dParts]);
   }
 
+  if (interventionFilter.size > 0) {
+    const ivParts = [];
+    if (interventionFilter.has('closure'))  ivParts.push(['in', 'Closure',    ['get', 'intervention']]);
+    if (interventionFilter.has('cleaning')) ivParts.push(['in', 'Deep Clean', ['get', 'intervention']]);
+    if (interventionFilter.has('other'))    ivParts.push(['all',
+      ['!', ['in', 'Closure',    ['get', 'intervention']]],
+      ['!', ['in', 'Deep Clean', ['get', 'intervention']]],
+    ]);
+    parts.push(ivParts.length === 1 ? ivParts[0] : ['any', ...ivParts]);
+  }
+
   return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
 }
 
@@ -863,12 +878,37 @@ function applyJsFilter(features) {
       const dist = p.district || '';
       if (![...districtFilter].some(v => dist.includes(v))) return false;
     }
+    if (interventionFilter.size > 0) {
+      const iv = p.intervention || '';
+      const isClosure  = iv.includes('Closure');
+      const isCleaning = iv.includes('Deep Clean');
+      const isOther    = !isClosure && !isCleaning;
+      const match =
+        (interventionFilter.has('closure')  && isClosure)  ||
+        (interventionFilter.has('cleaning') && isCleaning) ||
+        (interventionFilter.has('other')    && isOther);
+      if (!match) return false;
+    }
     return true;
   });
 }
 
 // ── Mayor checkbox filter ─────────────────────────────────────────────────
 function applyMayorFilter() {
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
+
+// ── Intervention type filter ──────────────────────────────────────────────
+function toggleIntervention(value) {
+  if (interventionFilter.has(value)) {
+    interventionFilter.delete(value);
+  } else {
+    interventionFilter.add(value);
+  }
+  document.getElementById('iv-closure').classList.toggle('active',  interventionFilter.has('closure'));
+  document.getElementById('iv-cleaning').classList.toggle('active', interventionFilter.has('cleaning'));
+  document.getElementById('iv-other').classList.toggle('active',    interventionFilter.has('other'));
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
 }
@@ -955,6 +995,10 @@ function resetFilters() {
   });
   map.setFilter('districts-fill',           ['==', ['get', 'name'], '!!NOMATCH!!']);
   map.setFilter('districts-active-outline', ['==', ['get', 'name'], '!!NOMATCH!!']);
+  interventionFilter.clear();
+  document.getElementById('iv-closure').classList.remove('active');
+  document.getElementById('iv-cleaning').classList.remove('active');
+  document.getElementById('iv-other').classList.remove('active');
   setFilter('all');
 }
 

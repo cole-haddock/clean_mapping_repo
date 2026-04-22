@@ -4,9 +4,26 @@ clean_mapping_repo/
 ├── map.js          ← all the JavaScript
 └── data/
     ├── posting_dots_4_2.geojson
-    └── combined_sweeps.geojson
+    └── combined_sweeps.geojso
 
-sidebar:
+
+
+4-21-26
+
+- fix the side bar
+- add a title
+- incorporate the into and the methodologies 
+
+
+
+s
+
+
+
+
+
+
+idebar:
 
 Introduction
 Oral Histories
@@ -28,6 +45,9 @@ Map filters (drop down arrow)
 
 About us
 Download this data
+
+
+
 
 
 

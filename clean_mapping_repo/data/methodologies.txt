@@ -1,0 +1,93 @@
+Cole Haddock
+April 2026
+
+Map Methodologies
+
+What the dataset describes: postings vs. operations vs. encampment sweeps
+
+Often, people refer to the actions conducted by the City of Oakland to remove unhoused people as sweeps. They also might say that the city is sweeping, or somebody is getting swept. We struggled to align these words with clear definitions for the purposes of our project, however. If two tents next to each other are getting swept, is that one sweep or two? If one continuous community is getting swept, is that one large sweep? If so, how can that be comparable to a sweep where only one person is getting swept? Further, there are a range of sweeps not represented in this dataset at all — for example, private land sweeps, police move-along orders, or those conducted byCalTrans. 
+
+For these problems, and more, Street Spirit elected instead to utilize the words closures, postings and city operations.
+
+We’ve defined a closure as when officials from the City of Oakland’s Encampment Management Team, Department of Public Works, and the Oakland Police Department physically clear an encampment site. These workers force residents to relocate, tow vehicles, and dispose of tents and belongings. The City tracks how many closures they’ve conducted based off of how many separate flyers they’ve printed and posted. 
+
+The City of Oakland is legally mandated to notify residents before it conducts a closure. Workers will print out flyers to tape around the area that will be abated. These are generally called “pink slips,” “pink tags,” or “red tags” (red tags typically refer to RVs or cars at risk of getting towed.) Flyers get taped to tents, RVs, vehicles, lightpoles and other structures in the area. They announce that public works officials will arrive to close a specific area on a specific date. The specific area is generally not larger than a single block or a single park. 
+
+Common locations include:
+‘Snow Park’
+‘Solano Way between 14th Ave and 15th Ave’
+‘Solano Way between 15th Ave and 16th Ave’
+
+In the City’s dataset, each new closure record corresponds to a new location, even if they are adjoining streets and were abated on the same day. The number is therefore reflective of how many different flyers the City had to print and post, rather than how many separate closures were necessarily conducted.  For this reason, we refer to the city’s records as postings. There are 2,201 postings in the City of Oakland’s dataset. This number is commonly misconstrued by journalists and media outlets, who often refer to each one of these records as a separate sweep.
+
+Using the number  2,201 without context over-inflates the number of closures, and misconstrues the on-the-ground reality of closures. 
+
+In reality, the city will post up several blocks at a time, sometimes stretching entire neighborhoods. It is important to note that when the city posts up a block, several blocks, or a park — they are effectively taking control of the entire area for the entire length of time of the posting and several weeks afterwards (because it is illegal to “re-encamp” an area you’ve been swept from.) On the day(s) of the closure, they have a team of officials and workers that move through the area, clearing out each tent and RV one by one.
+
+Unhoused people often have partially- or non-functioning cars parked close to their camp and often have many belongings. It is extremely difficult for them to move very far. If the next block over is also posted up, unhoused people and advocates are forced to move much further on the day of the sweep, or simply get cleared again. For these reasons, it is illogical to only view the postings as separate incidents.
+
+We grouped the postings that are continuous geographically and temporally into city operations. We assume that from the City’s perspective, during an operation, their team is moving through all of the continuous  blocks during a continuous time frame. An operation is not done until all of the posted blocks in that continuous time frame are cleared. 
+
+There are a total of five types of encampment interventions described in the EMP that range from "Health & Hygiene" — routine sanitation and trash collection, which occur throughout the city, to “Deep Cleanings” — temporary displacement while an area is cleaned. There are also two types of closure: “Partial Closures” permanently close one section of an encampment while residents largely remain. “Full Closures” describe a complete and permanent closure, where re-encampment is prohibited (and can result in fines or jailtime).  There are also “Emergency Closures,” which are the same as Full Closures, but can happen without the same due process. The vast majority are Full Closures. 
+
+The City of Oakland’s dataset is fundamentally lacking, and all of these words —- sweep, posting, closure, and operation —- are misrepresentations in different ways. 
+
+
+What the dataset doesn’t describe
+
+In this dataset, there is no information about what actually happened at the sweep.  
+
+We don’t know:
+How many people were swept at each abatement;
+Whether they were offered housing by the City;
+If belongings were thrown away, and if so, what belongings;
+Whether property was stored by the City, and if so, if it was ever returned;
+Whether anyone was arrested;
+Whether anyone was sent to the hospital;
+Whether anyone was injured;
+How long the displaced people had lived at the swept location;
+If displaced people had anywhere to go after the sweep;
+If displaced people lost contact with the people they were staying with;
+If displaced people lost contact with case workers, parole officers, street doctors, or other outreach; and
+Whether there was sweep support on the ground.
+
+We can put together the pieces of what happened for some of the larger sweeps from activists and local media. The City of Oakland also keeps a record of some of their sweeps, posting photos of cleared areas on their Facebook page  . 
+
+To understand what happened at the largest sweeps, we have extensively interviewed Kelsey Hubbard — an on-the-ground activist that helps people move during sweeps. We also relied heavily on our editor, Alastair Boone, who has extensive experience on-the-ground reporting at sweeps. 
+
+Data processing
+
+Software utilized:
+VSCode 
+QGIS
+Mapbox
+Google API
+OpenStreetMaps API
+Google Earth
+
+Step one: downloading
+
+The most recent data has been downloaded from the City of Oakland Data portal 
+
+Step two: cleaning
+
+The location strings are cleaned and made to follow a uniform street. The locations are separated into “betweens” and “others.” The “betweens” are location strings that describe a street segment between two intersections — for example, “MLK Between 45th and 46th.” This would be cleaned into “Martin Luther King Jr. Way between 45th St and 46th St.” 
+
+Then, each “between” is turned from a street segment into two intersection points — for example, "Martin Luther King Jr. Way and 45th St” and “Martin Luther King Jr. Way and 46th St.” 
+
+Each of these intersections is run through a Google API, which searches for that intersection and returns a lat / long pair. Then, the OSM Roads network is utilized to draw a road segment between these two coordinate points. Finally, those lines are exported into QGIS and cleaned manually. 
+
+For the locations that are not road segments — i.e. “Mosswood Park” or “Lake Merritt” — those locations were separated out from the data set, and we utilized Google Earth to manually draw the appropriate polygons. 
+
+Step three: sweeps vs. postings
+
+In order to aggregate the postings into operations, they are first clumped geographically using a DBSCAN clustering algorithm. This assigns each posting a location cluster id — numbers 1–55. Then, within each group, the postings are grouped according to time - they are grouped together if they are on the same or immediately sequential (excluding holidays and weekends) dates. Each posting is assigned a temporal event id, which starts at one and runs up to one hundred. The two ids are combined to create an operation_id: XX_XX. There are 560 unique operation cluster ids. 
+
+We then utilized our team and a couple of volunteers to manually verify each of these operations. Doing this, we found small errors, such as when the blocks were too long and therefore too far apart to be clustered together even when they should have been, or when sweeps could not have been geographically continuous due to large infrastructure, such as bridges, even though they were extremely close geographically. 
+
+Step four: mapping
+
+This part is still being finalized - will finish this section later. 
+
+
+
