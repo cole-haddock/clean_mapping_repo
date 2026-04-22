@@ -997,6 +997,77 @@ a.ls-nav-btn { text-decoration: none; }
   opacity: 0.6;
 }
 
+/* ── Intro Overlay ──────────────────────────────────────────────────────── */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--panel-bg);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+}
+
+#intro-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  padding: 40px;
+}
+
+.intro-title {
+  font-family: 'Futura', sans-serif;
+  font-size: clamp(24px, 4vw, 48px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.intro-sub {
+  font-family: var(--font-mono);
+  font-size: clamp(13px, 1.5vw, 18px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.intro-byline {
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.2vw, 15px);
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+.intro-btn {
+  margin-top: 16px;
+  font-family: 'Futura', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-red);
+  border: none;
+  padding: 14px 36px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.intro-btn:hover {
+  background: #8a0000;
+}
+
 /* ── Mapbox Search Box ──────────────────────────────────────────────────── */
 mapbox-search-box {
   --mb-search-box-height: 28px;
