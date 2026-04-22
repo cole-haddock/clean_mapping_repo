@@ -111,6 +111,7 @@ map.on('load', async () => {
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
   updateCounts(allDotFeatures);
+  updateDistrictCounts();
 
   // Build posting_id → geometry location fallback for encoding mismatches
   linesGJ.features.forEach(f => {
@@ -365,6 +366,7 @@ map.on('load', async () => {
 
   // ── Click map background → reset ───────────────────────────────────────
   map.on('click', e => {
+    closeContentPanel();
     const hits = map.queryRenderedFeatures(e.point, {
       layers: ['dots-layer', 'lines-base', 'polygons-base'],
     });
@@ -990,4 +992,92 @@ function updateCounts(features) {
   } else {
     document.getElementById('date-range').textContent = '—';
   }
+}
+
+// ── District posting counts ───────────────────────────────────────────────
+function updateDistrictCounts() {
+  [1, 2, 3, 4, 5, 6, 7].forEach(n => {
+    const count = allDotFeatures.filter(f =>
+      (f.properties.district || '').includes(String(n))
+    ).length;
+    const el = document.getElementById(`district-count-${n}`);
+    if (el) el.textContent = count.toLocaleString();
+  });
+}
+
+// ── Content panel ─────────────────────────────────────────────────────────
+async function openContentPanel(url) {
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+
+  body.innerHTML = '<p class="cp-p" style="color:var(--text-dim)">Loading…</p>';
+  panel.classList.add('open');
+
+  const text = await fetch(url).then(r => r.text());
+  body.innerHTML = parseTxt(text);
+}
+
+function closeContentPanel() {
+  document.getElementById('content-panel').classList.remove('open');
+}
+
+function parseTxt(text) {
+  const lines  = text.split('\n');
+  const blocks = [];
+  let current  = [];
+
+  for (const line of lines) {
+    if (line.trim() === '') {
+      if (current.length) { blocks.push(current); current = []; }
+    } else {
+      current.push(line.trim());
+    }
+  }
+  if (current.length) blocks.push(current);
+
+  let html = '';
+  let firstBlock = true;
+
+  for (const block of blocks) {
+    const joined = block.join(' ');
+    const single = block.length === 1;
+    const short  = joined.length < 80;
+    const noEnd  = !/[.!?]$/.test(joined);
+
+    // First block = meta (author / date)
+    if (firstBlock) {
+      html += `<div class="cp-meta">${block.join(' &nbsp;·&nbsp; ')}</div>`;
+      firstBlock = false;
+      continue;
+    }
+
+    // Page title — second block
+    if (html.indexOf('cp-title') === -1 && short && noEnd) {
+      html += `<div class="cp-title">${joined}</div>`;
+      continue;
+    }
+
+    // Section header — short, no end punctuation, single line
+    if (single && short && noEnd) {
+      html += `<div class="cp-section-header">${joined}</div>`;
+      continue;
+    }
+
+    // Location examples — lines starting with a quote
+    if (block.every(l => l.startsWith("'"))) {
+      html += block.map(l => `<div class="cp-location">${l}</div>`).join('');
+      continue;
+    }
+
+    // List — multiple lines each ending with ; or starts with keyword pattern
+    if (block.length > 2 && block.slice(0, -1).every(l => /[;,]$/.test(l))) {
+      html += `<ul class="cp-list">${block.map(l => `<li>${l.replace(/;$/, '')}</li>`).join('')}</ul>`;
+      continue;
+    }
+
+    // Plain paragraph
+    html += `<p class="cp-p">${block.join('<br>')}</p>`;
+  }
+
+  return html;
 }

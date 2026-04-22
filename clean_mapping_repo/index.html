@@ -35,10 +35,11 @@
       <div class="left-sidebar-inner">
 
         <button class="ls-nav-btn">Introduction</button>
-        <button class="ls-nav-btn">Oral Histories</button>
-        <button class="ls-nav-btn">Key Analysis</button>
-        <button class="ls-nav-btn">Methodologies</button>
+        <button class="ls-nav-btn">Analysis</button>
+        <button class="ls-nav-btn" onclick="openContentPanel('data/methodologies.txt')">Methodologies</button>
 
+        <div class="ls-divider"></div>
+        <button class="ls-section-header">Oral Histories</button>
         <div class="ls-divider"></div>
 
         <div class="ls-section">
@@ -124,16 +125,17 @@
                     <tr>
                       <th></th>
                       <th>District</th>
+                      <th>Postings</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td><input type="checkbox" id="district-1" checked onchange="applyDistrictFilter()" /></td><td>District 1</td></tr>
-                    <tr><td><input type="checkbox" id="district-2" checked onchange="applyDistrictFilter()" /></td><td>District 2</td></tr>
-                    <tr><td><input type="checkbox" id="district-3" checked onchange="applyDistrictFilter()" /></td><td>District 3</td></tr>
-                    <tr><td><input type="checkbox" id="district-4" checked onchange="applyDistrictFilter()" /></td><td>District 4</td></tr>
-                    <tr><td><input type="checkbox" id="district-5" checked onchange="applyDistrictFilter()" /></td><td>District 5</td></tr>
-                    <tr><td><input type="checkbox" id="district-6" checked onchange="applyDistrictFilter()" /></td><td>District 6</td></tr>
-                    <tr><td><input type="checkbox" id="district-7" checked onchange="applyDistrictFilter()" /></td><td>District 7</td></tr>
+                    <tr><td><input type="checkbox" id="district-1" checked onchange="applyDistrictFilter()" /></td><td>District 1</td><td id="district-count-1">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-2" checked onchange="applyDistrictFilter()" /></td><td>District 2</td><td id="district-count-2">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-3" checked onchange="applyDistrictFilter()" /></td><td>District 3</td><td id="district-count-3">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-4" checked onchange="applyDistrictFilter()" /></td><td>District 4</td><td id="district-count-4">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-5" checked onchange="applyDistrictFilter()" /></td><td>District 5</td><td id="district-count-5">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-6" checked onchange="applyDistrictFilter()" /></td><td>District 6</td><td id="district-count-6">—</td></tr>
+                    <tr><td><input type="checkbox" id="district-7" checked onchange="applyDistrictFilter()" /></td><td>District 7</td><td id="district-count-7">—</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -155,8 +157,7 @@
 
         <div class="ls-divider"></div>
 
-        <button class="ls-nav-btn">About Us</button>
-        <button class="ls-nav-btn">Download This Data</button>
+        <a class="ls-nav-btn" href="https://thestreetspirit.org/article_author/cole-haddock-and-maria-toldi/" target="_blank" rel="noopener">About Us</a>
 
       </div>
 
@@ -257,6 +258,12 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Content Panel — outside map-wrap to avoid canvas layout interference -->
+  <div id="content-panel">
+    <button class="sidebar-close" onclick="closeContentPanel()">✕</button>
+    <div class="content-panel-inner" id="content-panel-body"></div>
   </div>
 
   <script src="map.js"></script>
