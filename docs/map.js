@@ -1050,6 +1050,16 @@ function updateDistrictCounts() {
 }
 
 // ── Content panel ─────────────────────────────────────────────────────────
+function openComingSoonPanel(title) {
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  body.innerHTML = `
+    <div class="cp-title">${title}</div>
+    <p class="cp-p">Coming Soon.</p>
+  `;
+  panel.classList.add('open');
+}
+
 async function openContentPanel(url) {
   const panel = document.getElementById('content-panel');
   const body  = document.getElementById('content-panel-body');

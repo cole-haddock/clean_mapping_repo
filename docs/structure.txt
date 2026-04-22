@@ -6,7 +6,18 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojso
 
+4 - 22 - 26
 
+things to fix:
+- will be published may 1 
+- the intervention types
+- the intervention filters
+- the automatic scrolling in the postings operations table
+- the methodologies - add the fonts and the drop down menu
+- add an intro opener pop-up
+- add tiny poem and oral histories
+- the district filters should start off
+- the header shrinking to different desktop sizes
 
 4-21-26
 
