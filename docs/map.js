@@ -1117,10 +1117,27 @@ function applyAnimationFilter() {
 }
 
 function applyAnimLineFilter() {
-  const d = animationCurrentDate;
-  const dateExpr = ['<=', ['get', '_min_posting_date'], d];
-  map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, dateExpr]);
-  map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, dateExpr]);
+  const savedDateTo = dateTo;
+  dateTo = null;
+  const visibleDots = applyJsFilter(allDotFeatures).filter(f => {
+    const d = (f.properties.operation_start_date || '').slice(0, 10);
+    return d && d <= animationCurrentDate;
+  });
+  dateTo = savedDateTo;
+
+  const locs = [...new Set(
+    visibleDots.map(f => postingIdToGeomLoc[String(f.properties.posting_id)] || f.properties.location)
+  )].filter(Boolean);
+
+  if (locs.length === 0) {
+    map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, NOMATCH]);
+    map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, NOMATCH]);
+    return;
+  }
+
+  const locFilter = ['in', ['get', 'location'], ['literal', locs]];
+  map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, locFilter]);
+  map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, locFilter]);
 }
 
 function restoreLineFilter() {
@@ -1319,7 +1336,96 @@ async function openContentPanel(url) {
 }
 
 function closeContentPanel() {
-  document.getElementById('content-panel').classList.remove('open');
+  const panel = document.getElementById('content-panel');
+  panel.classList.remove('open');
+  panel.classList.remove('see-data');
+}
+
+function openSeeAllPanel() {
+  const panel = document.getElementById('content-panel');
+  panel.classList.add('see-data');
+  const body  = document.getElementById('content-panel-body');
+
+  const filtered = [...applyJsFilter(allDotFeatures)].sort((a, b) =>
+    (a.properties.operation_start_date || '') < (b.properties.operation_start_date || '') ? -1 : 1
+  );
+
+  // Build per-operation stats from filtered postings
+  const opMap = {};
+  filtered.forEach(f => {
+    const p   = f.properties;
+    const sid = p.sweep_event_id;
+    if (!sid) return;
+    if (!opMap[sid]) opMap[sid] = { sid, min: null, max: null, postings: 0, locs: new Set() };
+    const s = new Date(p.operation_start_date);
+    const e = new Date(p.operation_end_date);
+    if (!opMap[sid].min || s < opMap[sid].min) opMap[sid].min = s;
+    if (!opMap[sid].max || e > opMap[sid].max) opMap[sid].max = e;
+    opMap[sid].postings++;
+    opMap[sid].locs.add(p.unique_location_id);
+  });
+  const ops = Object.values(opMap).sort((a, b) => a.min - b.min);
+
+  const postingRows = filtered.map(f => {
+    const p   = f.properties;
+    const lat = p.load_lat != null ? p.load_lat : f.geometry.coordinates[1];
+    const lon = p.load_lon != null ? p.load_lon : f.geometry.coordinates[0];
+    const coords = (lat != null && lon != null)
+      ? `${Number(lat).toFixed(4)}, ${Number(lon).toFixed(4)}`
+      : '—';
+    return `<tr>
+      <td class="td-date">${formatDate(p.operation_start_date)}</td>
+      <td class="td-date">${formatDate(p.operation_end_date)}</td>
+      <td class="sa-loc">${p.location || '—'}</td>
+      <td><span class="td-dot" style="background:${interventionColor(p.intervention)};display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:5px;opacity:0.85;"></span>${p.intervention || '—'}</td>
+      <td class="td-oplen">${p.district || '—'}</td>
+      <td class="td-oplen">${p.sensitivity_zone || '—'}</td>
+      <td class="td-oplen" style="white-space:nowrap;">${coords}</td>
+    </tr>`;
+  }).join('');
+
+  const opRows = ops.map(op => {
+    const days = op.min && op.max ? Math.round((op.max - op.min) / 86400000) + 1 : 1;
+    return `<tr>
+      <td class="td-sweep-id">${op.sid || '—'}</td>
+      <td class="td-date">${op.min ? formatDate(op.min.toISOString()) : '—'}</td>
+      <td class="td-date">${op.max ? formatDate(op.max.toISOString()) : '—'}</td>
+      <td class="td-oplen">${days}</td>
+      <td class="td-oplen">${op.postings}</td>
+      <td class="td-oplen">${op.locs.size}</td>
+    </tr>`;
+  }).join('');
+
+  body.innerHTML = `
+    <div class="sa-section">
+      <button class="sa-toggle" onclick="toggleSeeAll('sa-postings-body','sa-chev-postings')">
+        Postings <span class="sa-count">(${filtered.length})</span>
+        <span class="sa-chevron" id="sa-chev-postings">▼</span>
+      </button>
+      <div id="sa-postings-body" class="sa-body">
+        <table><thead><tr><th>Start</th><th>End</th><th>Location</th><th>Intervention</th><th>District</th><th>Sens. Zone</th><th>Coordinates</th></tr></thead>
+        <tbody>${postingRows}</tbody></table>
+      </div>
+    </div>
+    <div class="sa-section">
+      <button class="sa-toggle" onclick="toggleSeeAll('sa-ops-body','sa-chev-ops')">
+        Operations <span class="sa-count">(${ops.length})</span>
+        <span class="sa-chevron" id="sa-chev-ops">▼</span>
+      </button>
+      <div id="sa-ops-body" class="sa-body">
+        <table><thead><tr><th>Sweep</th><th>Start</th><th>End</th><th>Days</th><th>Postings</th><th>Locations</th></tr></thead>
+        <tbody>${opRows}</tbody></table>
+      </div>
+    </div>
+  `;
+
+  panel.classList.add('open');
+}
+
+function toggleSeeAll(bodyId, chevId) {
+  const el = document.getElementById(bodyId);
+  el.classList.toggle('hidden');
+  document.getElementById(chevId).textContent = el.classList.contains('hidden') ? '▶' : '▼';
 }
 
 function parseTxt(text) {

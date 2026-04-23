@@ -184,7 +184,9 @@ header {
   position: fixed;
   top: var(--header-h);
   right: 0;
-  width: min(680px, 90vw);
+  width: max-content;
+  min-width: min(560px, 90vw);
+  max-width: calc(100vw - 60px);
   height: calc(100vh - var(--header-h));
   background: var(--panel-bg);
   border-left: 1px solid var(--panel-border);
@@ -1084,6 +1086,79 @@ mapbox-search-box {
 /* ── Mapbox overrides ───────────────────────────────────────────────────── */
 .mapboxgl-ctrl-bottom-right {
   bottom: 28px;
+}
+
+/* ── See All panel ──────────────────────────────────────────────────────── */
+.sa-section { margin-bottom: 8px; }
+
+#content-panel.see-data .content-panel-inner { padding-top: 16px; }
+
+.sa-toggle {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  background: var(--panel-bg);
+  border: none;
+  border-bottom: 2px solid var(--panel-border);
+  font-family: 'Futura', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  padding: 10px 0;
+  cursor: pointer;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.sa-toggle:hover { color: var(--accent-red); }
+
+.sa-count {
+  color: var(--accent-red);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+
+.sa-chevron { margin-left: auto; font-size: 9px; color: var(--text-muted); }
+
+.sa-body.hidden { display: none; }
+
+.sa-body table {
+  width: max-content;
+  min-width: 100%;
+}
+
+.sa-body table thead {
+  top: 40px;
+}
+
+.sa-body thead th {
+  white-space: nowrap;
+  border-top: 1px solid var(--panel-border);
+}
+
+.sa-body tbody td {
+  white-space: nowrap;
+}
+
+.sa-intervention {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sa-loc {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Animation ──────────────────────────────────────────────────────────── */
