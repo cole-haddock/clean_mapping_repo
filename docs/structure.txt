@@ -10,7 +10,9 @@ clean_mapping_repo/
 
 things to do:
 
-- oral histr
+- oral histories
+- polygon drawing tool
+- ? marks for the filters
 
 
 4 - 22 - 26

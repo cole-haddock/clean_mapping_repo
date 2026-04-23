@@ -22,6 +22,9 @@ let allDotFeatures        = [];    // stashed on load for count resets
 let postingIdToGeomLoc    = {};    // fallback: posting_id → geometry location string
 let focusMode             = true;  // when true, dots hide on location select
 let geomByLocation        = {};    // location string → geometry feature (for district/zone fallback)
+let drawingActive         = false;
+let activeZonePolygon     = null;
+let draw                  = null;
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -36,6 +39,18 @@ const MAYOR_TERMS = [
   { id: 'mayor-bas',      start: '2024-12-17', end: '2025-01-06' },
   { id: 'mayor-jenkins',  start: '2025-01-06', end: '2025-05-20' },
   { id: 'mayor-lee',      start: '2025-05-20', end: '2099-12-31' },
+];
+
+// ── MapboxDraw styles (red to match site palette) ─────────────────────────
+const DRAW_STYLES = [
+  { id: 'gl-draw-polygon-fill-inactive',   type: 'fill',   filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']], paint: { 'fill-color': '#ac0000', 'fill-outline-color': '#ac0000', 'fill-opacity': 0.08 } },
+  { id: 'gl-draw-polygon-fill-active',     type: 'fill',   filter: ['all', ['==', 'active', 'true'],  ['==', '$type', 'Polygon']], paint: { 'fill-color': '#ac0000', 'fill-outline-color': '#ac0000', 'fill-opacity': 0.12 } },
+  { id: 'gl-draw-polygon-stroke-inactive', type: 'line',   filter: ['all', ['==', 'active', 'false'], ['==', '$type', 'Polygon'], ['!=', 'mode', 'static']], paint: { 'line-color': '#ac0000', 'line-width': 2 } },
+  { id: 'gl-draw-polygon-stroke-active',   type: 'line',   filter: ['all', ['==', 'active', 'true'],  ['==', '$type', 'Polygon']], paint: { 'line-color': '#ac0000', 'line-dasharray': [0.2, 2], 'line-width': 2 } },
+  { id: 'gl-draw-line-active',             type: 'line',   filter: ['all', ['==', '$type', 'LineString'], ['==', 'active', 'true']], paint: { 'line-color': '#ac0000', 'line-dasharray': [0.2, 2], 'line-width': 2 } },
+  { id: 'gl-draw-polygon-midpoint',        type: 'circle', filter: ['all', ['==', '$type', 'Point'], ['==', 'meta', 'midpoint']], paint: { 'circle-radius': 3, 'circle-color': '#ac0000' } },
+  { id: 'gl-draw-vertex-halo',             type: 'circle', filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']], paint: { 'circle-radius': 6, 'circle-color': '#fff' } },
+  { id: 'gl-draw-vertex',                  type: 'circle', filter: ['all', ['==', 'meta', 'vertex'], ['==', '$type', 'Point'], ['!=', 'mode', 'static']], paint: { 'circle-radius': 4, 'circle-color': '#ac0000' } },
 ];
 
 // ── Map init ──────────────────────────────────────────────────────────────
@@ -321,12 +336,13 @@ map.on('load', async () => {
 
   // ── Cursor changes ─────────────────────────────────────────────────────
   ['dots-layer', 'lines-base', 'polygons-base'].forEach(layer => {
-    map.on('mouseenter', layer, () => { map.getCanvas().style.cursor = 'pointer'; });
-    map.on('mouseleave', layer, () => { map.getCanvas().style.cursor = ''; });
+    map.on('mouseenter', layer, () => { if (!drawingActive) map.getCanvas().style.cursor = 'pointer'; });
+    map.on('mouseleave', layer, () => { if (!drawingActive) map.getCanvas().style.cursor = ''; });
   });
 
   // ── Click a dot ────────────────────────────────────────────────────────
   map.on('click', 'dots-layer', e => {
+    if (drawingActive) return;
     e.preventDefault();
     handleDotClick(e.features[0].properties);
   });
@@ -334,6 +350,7 @@ map.on('load', async () => {
   // ── Click a line or polygon → find a matching dot and open sidebar ─────
   ['lines-base', 'polygons-base'].forEach(layer => {
     map.on('click', layer, e => {
+      if (drawingActive) return;
       e.preventDefault();
       // If dots are currently visible at this point, let the dot handler take precedence
       const dotsHere = map.queryRenderedFeatures(e.point, { layers: ['dots-layer'] });
@@ -367,11 +384,35 @@ map.on('load', async () => {
 
   // ── Click map background → reset ───────────────────────────────────────
   map.on('click', e => {
+    if (drawingActive) return;
     closeContentPanel();
     const hits = map.queryRenderedFeatures(e.point, {
       layers: ['dots-layer', 'lines-base', 'polygons-base'],
     });
     if (hits.length === 0) closeSidebar();
+  });
+
+  // ── Draw tool init ──────────────────────────────────────────────────────
+  draw = new MapboxDraw({ displayControlsDefault: false, styles: DRAW_STYLES });
+  map.addControl(draw);
+
+  map.on('draw.create', e => { if (e.features[0]) finishDrawZone(e.features[0]); });
+
+  // Enter closes the polygon; Escape cancels (MapboxDraw handles Escape internally,
+  // but we need to sync our UI state when it does)
+  document.addEventListener('keydown', e => {
+    if (!drawingActive || e.key !== 'Enter') return;
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    draw.changeMode('simple_select');
+  });
+
+  map.on('draw.modechange', e => {
+    if (drawingActive && e.mode === 'simple_select') {
+      drawingActive = false;
+      const btn = document.getElementById('btn-draw-zone');
+      btn.textContent = activeZonePolygon ? 'Redraw Zone' : 'Draw Zone';
+      btn.classList.remove('active');
+    }
   });
 
 });
@@ -969,6 +1010,7 @@ function applyDateFilter() {
 }
 
 function resetFilters() {
+  clearZone();
   dateFrom = null;
   dateTo   = null;
   const fromEl = document.getElementById('ls-date-from');
@@ -996,6 +1038,67 @@ function resetFilters() {
   setFilter('all');
 }
 
+// ── Zone draw functions ───────────────────────────────────────────────────
+function toggleDrawZone() {
+  drawingActive ? cancelDrawZone() : startDrawZone();
+}
+
+function startDrawZone() {
+  draw.deleteAll();
+  activeZonePolygon = null;
+  document.getElementById('zone-results').classList.remove('visible');
+  document.getElementById('btn-draw-zone').textContent = 'Cancel Drawing';
+  document.getElementById('btn-draw-zone').classList.add('active');
+  drawingActive = true;
+  draw.changeMode('draw_polygon');
+}
+
+function cancelDrawZone() {
+  drawingActive = false;
+  draw.changeMode('simple_select');
+  document.getElementById('btn-draw-zone').textContent = 'Draw Zone';
+  document.getElementById('btn-draw-zone').classList.remove('active');
+}
+
+function clearZone() {
+  if (!draw) return;
+  draw.deleteAll();
+  activeZonePolygon = null;
+  cancelDrawZone();
+  document.getElementById('zone-results').classList.remove('visible');
+}
+
+function finishDrawZone(polygon) {
+  activeZonePolygon = polygon;
+  drawingActive = false;
+  document.getElementById('btn-draw-zone').textContent = 'Redraw Zone';
+  document.getElementById('btn-draw-zone').classList.remove('active');
+  computeZoneStats(polygon);
+}
+
+function computeZoneStats(polygon) {
+  const filtered = applyJsFilter(allDotFeatures);
+  const within   = turf.pointsWithinPolygon(turf.featureCollection(filtered), polygon);
+  const features = within.features;
+
+  const postings  = features.length;
+  const ops       = new Set(features.map(f => f.properties.sweep_event_id).filter(Boolean)).size;
+  const closures  = features.filter(f => f.properties.intervention === 'Closure').length;
+  const cleanings = features.filter(f => f.properties.intervention === 'Deep Cleaning').length;
+  const other     = features.filter(f => f.properties.intervention !== 'Closure' && f.properties.intervention !== 'Deep Cleaning').length;
+
+  document.getElementById('zone-postings').textContent  = postings.toLocaleString();
+  document.getElementById('zone-ops').textContent       = ops.toLocaleString();
+  document.getElementById('zone-closures').textContent  = closures.toLocaleString();
+  document.getElementById('zone-cleanings').textContent = cleanings.toLocaleString();
+  document.getElementById('zone-other').textContent     = other.toLocaleString();
+  document.getElementById('zone-results').classList.add('visible');
+}
+
+function refreshZoneIfActive() {
+  if (activeZonePolygon) computeZoneStats(activeZonePolygon);
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────
 function interventionColor(intervention) {
   if (intervention === 'Closure')      return '#ac0000';
@@ -1013,6 +1116,7 @@ function formatDate(str) {
 }
 
 function updateCounts(features) {
+  refreshZoneIfActive();
   const postings = features.length;
   const ops = new Set(features.map(f => f.properties.sweep_event_id).filter(Boolean)).size;
   document.getElementById('dot-count').textContent = Number(postings).toLocaleString();

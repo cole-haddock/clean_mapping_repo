@@ -9,6 +9,7 @@
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <script id="search-js" defer src="https://api.mapbox.com/search-js/v1.0.0/web.js"></script>
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.css" />
 </head>
 <body>
 
@@ -158,6 +159,19 @@
               </div>
             </div>
 
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Draw Zone</div>
+              <button class="ls-draw-btn" id="btn-draw-zone" onclick="toggleDrawZone()">Draw Zone</button>
+              <div id="zone-results" class="zone-results">
+                <div class="zone-stat-row"><span>Postings</span><span class="zone-stat-value" id="zone-postings">—</span></div>
+                <div class="zone-stat-row"><span>Operations</span><span class="zone-stat-value" id="zone-ops">—</span></div>
+                <div class="zone-stat-row zone-stat-sub"><span>Closures</span><span id="zone-closures">—</span></div>
+                <div class="zone-stat-row zone-stat-sub"><span>Deep Cleanings</span><span id="zone-cleanings">—</span></div>
+                <div class="zone-stat-row zone-stat-sub"><span>Other</span><span id="zone-other">—</span></div>
+                <button class="ls-draw-btn ls-draw-btn-clear" onclick="clearZone()">Clear Zone</button>
+              </div>
+            </div>
+
             <button class="ls-reset-btn" onclick="resetFilters()">Reset Filters</button>
 
           </div>
@@ -284,6 +298,8 @@
     </div>
   </div>
 
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="map.js"></script>
 </body>
 </html>

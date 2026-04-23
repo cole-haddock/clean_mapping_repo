@@ -1086,6 +1086,71 @@ mapbox-search-box {
   bottom: 28px;
 }
 
+/* ── Zone draw tool ─────────────────────────────────────────────────────── */
+.ls-draw-btn {
+  display: block;
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 0;
+  background: none;
+  border: 1px solid var(--panel-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.ls-draw-btn:hover {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.ls-draw-btn.active {
+  background: var(--accent-red);
+  border-color: var(--accent-red);
+  color: #fff;
+}
+
+.ls-draw-btn-clear {
+  margin-top: 10px;
+}
+
+.zone-results {
+  display: none;
+  margin-top: 10px;
+}
+
+.zone-results.visible {
+  display: block;
+}
+
+.zone-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--bg);
+}
+
+.zone-stat-sub {
+  color: var(--text-muted);
+  padding-left: 10px;
+  font-size: 10px;
+}
+
+.zone-stat-value {
+  color: var(--accent-red);
+  font-weight: 600;
+}
+
 .mapboxgl-popup-content {
   font-family: var(--font-mono);
   font-size: 10px;
