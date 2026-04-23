@@ -25,6 +25,9 @@ let geomByLocation        = {};    // location string → geometry feature (for 
 let drawingActive         = false;
 let activeZonePolygon     = null;
 let draw                  = null;
+let animating             = false;
+let animationInterval     = null;
+let animationCurrentDate  = null;
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -128,6 +131,7 @@ map.on('load', async () => {
   allDotFeatures = dotsGJ.features;
   updateCounts(allDotFeatures);
   updateDistrictCounts();
+  initAnimationDateInputs();
 
   // Build posting_id → geometry location fallback for encoding mismatches
   linesGJ.features.forEach(f => {
@@ -135,6 +139,18 @@ map.on('load', async () => {
     parseSweepIds(f.properties.posting_ids).forEach(pid => {
       postingIdToGeomLoc[String(pid)] = loc;
     });
+  });
+
+  // Tag each sweep feature with the earliest posting date via posting_id lookup
+  const dotDateByPid = {};
+  dotsGJ.features.forEach(f => {
+    dotDateByPid[String(f.properties.posting_id)] =
+      (f.properties.operation_start_date || '').slice(0, 10);
+  });
+  linesGJ.features = linesGJ.features.map(f => {
+    const pids  = parseSweepIds(f.properties.posting_ids);
+    const dates = pids.map(pid => dotDateByPid[String(pid)]).filter(Boolean).sort();
+    return { ...f, properties: { ...f.properties, _min_posting_date: dates[0] || '' } };
   });
 
   // ── Sources ────────────────────────────────────────────────────────────
@@ -389,7 +405,7 @@ map.on('load', async () => {
     const hits = map.queryRenderedFeatures(e.point, {
       layers: ['dots-layer', 'lines-base', 'polygons-base'],
     });
-    if (hits.length === 0) closeSidebar();
+    if (hits.length === 0) { restoreLineFilter(); closeSidebar(); }
   });
 
   // ── Draw tool init ──────────────────────────────────────────────────────
@@ -1011,6 +1027,8 @@ function applyDateFilter() {
 
 function resetFilters() {
   clearZone();
+  finishAnimation();
+  restoreLineFilter();
   dateFrom = null;
   dateTo   = null;
   const fromEl = document.getElementById('ls-date-from');
@@ -1036,6 +1054,138 @@ function resetFilters() {
   document.getElementById('iv-cleaning').classList.remove('active');
   document.getElementById('iv-other').classList.remove('active');
   setFilter('all');
+}
+
+// ── Animation ─────────────────────────────────────────────────────────────
+function initAnimationDateInputs() {
+  const { min, max } = getDatasetDateRange();
+  const fromEl = document.getElementById('anim-date-from');
+  const toEl   = document.getElementById('anim-date-to');
+  if (fromEl && !fromEl.value) fromEl.value = min;
+  if (toEl   && !toEl.value)   toEl.value   = max;
+}
+
+function getAnimBounds() {
+  const { min, max } = getDatasetDateRange();
+  return {
+    from: document.getElementById('anim-date-from').value || min,
+    to:   document.getElementById('anim-date-to').value   || max,
+  };
+}
+
+function getDatasetDateRange() {
+  const dates = allDotFeatures
+    .map(f => f.properties.operation_start_date)
+    .filter(Boolean)
+    .map(d => d.slice(0, 10))
+    .sort();
+  return { min: dates[0], max: dates[dates.length - 1] };
+}
+
+function buildMonthlySteps(fromStr, toStr) {
+  const steps = [];
+  const end   = new Date(toStr + 'T00:00:00');
+  const start = new Date(fromStr + 'T00:00:00');
+  let year  = start.getFullYear();
+  let month = start.getMonth();
+
+  while (true) {
+    const lastOfMonth = new Date(year, month + 1, 0);
+    const stepDate    = lastOfMonth <= end ? lastOfMonth : end;
+    steps.push(stepDate.toISOString().slice(0, 10));
+    if (stepDate >= end) break;
+    month++;
+    if (month > 11) { month = 0; year++; }
+  }
+  return steps;
+}
+
+function updateAnimationDisplay(dateStr) {
+  const el = document.getElementById('anim-date-display');
+  if (!dateStr) { el.textContent = '—'; return; }
+  const d = new Date(dateStr + 'T00:00:00');
+  el.textContent = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+}
+
+function applyAnimationFilter() {
+  const savedDateTo = dateTo;
+  dateTo = null;
+  const base = buildDotFilter();
+  dateTo = savedDateTo;
+  const upper = ['<=', ['slice', ['get', 'operation_start_date'], 0, 10], animationCurrentDate];
+  map.setFilter('dots-layer', base ? ['all', base, upper] : upper);
+}
+
+function applyAnimLineFilter() {
+  const d = animationCurrentDate;
+  const dateExpr = ['<=', ['get', '_min_posting_date'], d];
+  map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, dateExpr]);
+  map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, dateExpr]);
+}
+
+function restoreLineFilter() {
+  map.setFilter('lines-sweep-highlight',    ['all', IS_LINE, NOMATCH]);
+  map.setFilter('polygons-sweep-highlight', ['all', IS_POLY, NOMATCH]);
+}
+
+function toggleAnimation() {
+  animating ? pauseAnimation() : playAnimation();
+}
+
+function playAnimation() {
+  const { from, to } = getAnimBounds();
+
+  if (!animationCurrentDate || animationCurrentDate >= to) animationCurrentDate = from;
+
+  const steps = buildMonthlySteps(animationCurrentDate, to);
+  let stepIndex = 0;
+
+  animating = true;
+  document.getElementById('btn-anim-play').textContent = 'Pause';
+  document.getElementById('btn-anim-play').classList.add('active');
+
+  updateAnimationDisplay(animationCurrentDate);
+  applyAnimationFilter();
+  applyAnimLineFilter();
+
+  animationInterval = setInterval(() => {
+    stepIndex++;
+    if (stepIndex >= steps.length) { finishAnimation(); return; }
+    animationCurrentDate = steps[stepIndex];
+    updateAnimationDisplay(animationCurrentDate);
+    applyAnimationFilter();
+    applyAnimLineFilter();
+  }, 250);
+}
+
+function pauseAnimation() {
+  clearInterval(animationInterval);
+  animationInterval = null;
+  animating = false;
+  document.getElementById('btn-anim-play').textContent = 'Play';
+  document.getElementById('btn-anim-play').classList.remove('active');
+}
+
+function finishAnimation() {
+  pauseAnimation();
+  animationCurrentDate = null;
+  updateAnimationDisplay(null);
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+}
+
+function animSeekStart() {
+  if (animating) pauseAnimation();
+  animationCurrentDate = getAnimBounds().from;
+  updateAnimationDisplay(animationCurrentDate);
+  applyAnimationFilter();
+}
+
+function animSeekEnd() {
+  if (animating) pauseAnimation();
+  animationCurrentDate = getAnimBounds().to;
+  updateAnimationDisplay(animationCurrentDate);
+  applyAnimationFilter();
 }
 
 // ── Zone draw functions ───────────────────────────────────────────────────

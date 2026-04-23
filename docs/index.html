@@ -160,6 +160,21 @@
             </div>
 
             <div class="ls-filter-group">
+              <div class="ls-filter-label">Animate</div>
+              <div class="anim-date-display" id="anim-date-display">—</div>
+              <div class="ls-time-inputs anim-inputs">
+                <input class="ls-date-input" type="date" id="anim-date-from" />
+                <span class="ls-date-sep">–</span>
+                <input class="ls-date-input" type="date" id="anim-date-to" />
+              </div>
+              <div class="ls-toggle-row">
+                <button class="ls-toggle-btn" id="btn-anim-start" onclick="animSeekStart()">Start</button>
+                <button class="ls-toggle-btn" id="btn-anim-end"   onclick="animSeekEnd()">End</button>
+                <button class="ls-toggle-btn" id="btn-anim-play"  onclick="toggleAnimation()">Play</button>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
               <div class="ls-filter-label">Draw Zone</div>
               <button class="ls-draw-btn" id="btn-draw-zone" onclick="toggleDrawZone()">Draw Zone</button>
               <div id="zone-results" class="zone-results">

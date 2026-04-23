@@ -1086,6 +1086,19 @@ mapbox-search-box {
   bottom: 28px;
 }
 
+/* ── Animation ──────────────────────────────────────────────────────────── */
+.anim-date-display {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--accent-red);
+  text-align: center;
+  padding: 4px 0 10px;
+  min-height: 22px;
+}
+
+.anim-inputs { margin-bottom: 8px; }
+
 /* ── Zone draw tool ─────────────────────────────────────────────────────── */
 .ls-draw-btn {
   display: block;
