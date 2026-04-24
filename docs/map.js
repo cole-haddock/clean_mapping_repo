@@ -1,3 +1,10 @@
+function toggleInfoTip(id) {
+  const tip = document.getElementById(id);
+  const btn = tip.previousElementSibling.querySelector('.ls-info-btn');
+  const isVisible = tip.classList.toggle('visible');
+  btn.classList.toggle('active', isVisible);
+}
+
 // ── CONFIG — swap these before pushing to GitHub ─────────────────────────
 mapboxgl.accessToken = 'pk.eyJ1IjoiY29sZS1oYWRkb2NrIiwiYSI6ImNtbWtxbWRzaTF0ZWEycHByYmhxanVydGsifQ.BeBPsJNRNCmbHeqcaN35-A';
 
@@ -1314,6 +1321,71 @@ function updateDistrictCounts() {
 }
 
 // ── Content panel ─────────────────────────────────────────────────────────
+function openOralHistoriesPanel() {
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  body.innerHTML = `
+    <div class="cp-title">Oral Histories</div>
+    <p class="cp-p">Street Spirit is in the process of archiving testimonies from people who have been present at sweeps, including residents, activists, and others.</p>
+    <a class="cp-submit-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSffifZMZL6kkHMTVJLlKq2mVQRgCYWXfK87klzgFxLQYEogQw/viewform?usp=dialog" target="_blank" rel="noopener">Submit Oral Histories</a>
+    <div class="cp-section-header">Evicting sweeping towing<br><span class="cp-section-by">by Tiny Gray-Garcia of Homefulness and POOR Magazine</span></div>
+    <div class="cp-poem">Evicting towing sweeping killing
+Evicting deporting /stealing hoarding
+Sweeping evicting towing killing
+Towing sweeping evicting drilling
+This is a colonial desecration song
+Written through centuries of colonial wrongs
+Carved in blood of indigenous moms
+Bled into false settler colonial borders and walls
+Incarcerated with white supremacist laws
+
+Until there's only bones
+Of roofless homes
+Car parts
+And broken shopping carts
+And payday loans
+And police and ICE drones
+
+The desecration the destruction the eruptions
+Get out of that tiny house
+U don't even deserve
+
+Evicting sweeping towing killing
+Evicting sweeping towing drilling
+Evicting deporting /stealing hoarding
+
+Our blood is spilling
+Poor and houseless Families towed and swept and barely living Over land already stolen
+Taken so u could keep making more
+Broken souls with broken hearts with holes in them
+What about Homefulness?
+What about Wood Street Commons
+What about reclaiming homes
+What about Land Back Black land
+What about the houseless mamas
+
+But u wanna keep
+Evicting towing sweeping killing
+Evicting deporting /stealing hoarding
+
+Taking taking taking more and more in
+Evicting sweeping towing killing
+Evicting deporting stealing hoarding
+
+This is settler promises
+obsessed with profit
+And every houseless elder
+Who crosses
+False borders into more hardship
+Only learns
+Only earns
+Evicting sweeping towing killing
+Evicting deporting /stealing drilling
+Evicting sweeping towing killing</div>
+  `;
+  panel.classList.add('open');
+}
+
 function openComingSoonPanel(title) {
   const panel = document.getElementById('content-panel');
   const body  = document.getElementById('content-panel-body');

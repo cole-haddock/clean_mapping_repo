@@ -21,7 +21,7 @@
   --font-mono:    'Libre Bodoni', 'Courier New', serif;
   --font-sans:    'Libre Bodoni', 'Helvetica Neue', serif;
   --sidebar-w:     500px;
-  --left-sidebar-w: 340px;
+  --left-sidebar-w: 510px;
   --header-h:      46px;
 }
 
@@ -184,9 +184,7 @@ header {
   position: fixed;
   top: var(--header-h);
   right: 0;
-  width: max-content;
-  min-width: min(560px, 90vw);
-  max-width: calc(100vw - 60px);
+  width: min(560px, 90vw);
   height: calc(100vh - var(--header-h));
   background: var(--panel-bg);
   border-left: 1px solid var(--panel-border);
@@ -236,7 +234,7 @@ header {
 
 .cp-section-header {
   font-family: 'Futura', sans-serif;
-  font-size: 13px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -248,7 +246,7 @@ header {
 
 .cp-p {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 20px;
   line-height: 1.8;
   color: var(--text-primary);
   margin-bottom: 16px;
@@ -265,6 +263,44 @@ header {
 
 .cp-list li {
   margin-bottom: 4px;
+}
+
+.cp-submit-btn {
+  display: inline-block;
+  margin: 20px 0 28px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-red);
+  border: none;
+  padding: 12px 24px;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.cp-submit-btn:hover {
+  background: #8a0000;
+}
+
+.cp-section-by {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.cp-poem {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  line-height: 1.9;
+  color: var(--text-primary);
+  white-space: pre-line;
+  margin-top: 12px;
 }
 
 .cp-location {
@@ -584,7 +620,7 @@ tbody td.td-oplen-long {
   display: block;
   width: 100%;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 6px 12px;
@@ -648,7 +684,7 @@ tbody td.td-oplen-long {
   background: none;
   border: none;
   font-family: 'Futura', sans-serif;
-  font-size: 15px;
+  font-size: 23px;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -677,7 +713,7 @@ a.ls-nav-btn { text-decoration: none; }
   background: none;
   border: none;
   font-family: 'Futura', sans-serif;
-  font-size: 15px;
+  font-size: 23px;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -689,7 +725,7 @@ a.ls-nav-btn { text-decoration: none; }
 .ls-section-header:hover { color: var(--accent-red); }
 
 .ls-chevron {
-  font-size: 8px;
+  font-size: 12px;
   transition: transform 0.2s ease;
 }
 
@@ -720,14 +756,59 @@ a.ls-nav-btn { text-decoration: none; }
 
 .ls-filter-label {
   font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
   padding-bottom: 7px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ls-info-btn {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--panel-border);
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.ls-info-btn:hover, .ls-info-btn.active {
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.ls-info-tip {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg);
+  border-left: 2px solid var(--accent-red);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 0 2px 2px 0;
+}
+
+.ls-info-tip.visible {
+  display: block;
 }
 
 /* Time range */
@@ -740,7 +821,7 @@ a.ls-nav-btn { text-decoration: none; }
 .ls-date-input {
   flex: 1;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 17px;
   color: var(--text-primary);
   background: var(--bg);
   border: 1px solid var(--panel-border);
@@ -751,7 +832,7 @@ a.ls-nav-btn { text-decoration: none; }
 
 .ls-date-sep {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 17px;
   color: var(--text-muted);
 }
 
@@ -764,7 +845,7 @@ a.ls-nav-btn { text-decoration: none; }
 .ls-toggle-btn {
   flex: 1;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 6px 4px;
@@ -790,7 +871,7 @@ a.ls-nav-btn { text-decoration: none; }
   background: none;
   border: none;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -802,7 +883,7 @@ a.ls-nav-btn { text-decoration: none; }
 
 .ls-mayor-header:hover { color: var(--accent-red); }
 
-.ls-mayor-header .ls-chevron { font-size: 12px; }
+.ls-mayor-header .ls-chevron { font-size: 18px; }
 
 /* Mayor checkboxes */
 .ls-mayor-list {
@@ -816,7 +897,7 @@ a.ls-nav-btn { text-decoration: none; }
   align-items: center;
   gap: 8px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 17px;
   color: var(--text-primary);
   cursor: pointer;
 }
@@ -827,7 +908,7 @@ a.ls-nav-btn { text-decoration: none; }
   width: 100%;
   border-collapse: collapse;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
 }
 
 .ls-mayor-table thead th {
@@ -864,7 +945,7 @@ a.ls-nav-btn { text-decoration: none; }
   width: 100%;
   margin-top: 36px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 7px 0;
@@ -1164,7 +1245,7 @@ mapbox-search-box {
 /* ── Animation ──────────────────────────────────────────────────────────── */
 .anim-date-display {
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 20px;
   letter-spacing: 0.06em;
   color: var(--accent-red);
   text-align: center;
@@ -1179,7 +1260,7 @@ mapbox-search-box {
   display: block;
   width: 100%;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 7px 0;
@@ -1220,7 +1301,7 @@ mapbox-search-box {
   justify-content: space-between;
   align-items: baseline;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 17px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-primary);
@@ -1231,7 +1312,7 @@ mapbox-search-box {
 .zone-stat-sub {
   color: var(--text-muted);
   padding-left: 10px;
-  font-size: 10px;
+  font-size: 15px;
 }
 
 .zone-stat-value {
