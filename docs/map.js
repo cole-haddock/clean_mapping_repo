@@ -910,6 +910,10 @@ function buildDotFilter() {
     parts.push(ivParts.length === 1 ? ivParts[0] : ['any', ...ivParts]);
   }
 
+  if (activeZonePolygon) {
+    parts.push(['within', activeZonePolygon.geometry]);
+  }
+
   return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
 }
 
@@ -946,6 +950,9 @@ function applyJsFilter(features) {
         (interventionFilter.has('cleaning') && isCleaning) ||
         (interventionFilter.has('other')    && isOther);
       if (!match) return false;
+    }
+    if (activeZonePolygon) {
+      if (!turf.booleanPointInPolygon(f, activeZonePolygon)) return false;
     }
     return true;
   });
@@ -1240,6 +1247,8 @@ function clearZone() {
   activeZonePolygon = null;
   cancelDrawZone();
   document.getElementById('zone-results').classList.remove('visible');
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
 }
 
 function finishDrawZone(polygon) {
@@ -1247,6 +1256,8 @@ function finishDrawZone(polygon) {
   drawingActive = false;
   document.getElementById('btn-draw-zone').textContent = 'Redraw Zone';
   document.getElementById('btn-draw-zone').classList.remove('active');
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
   computeZoneStats(polygon);
 }
 
@@ -1328,7 +1339,7 @@ function openOralHistoriesPanel() {
     <div class="cp-title">Oral Histories</div>
     <p class="cp-p">Street Spirit is in the process of archiving testimonies from people who have been present at sweeps, including residents, activists, and others.</p>
     <a class="cp-submit-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSffifZMZL6kkHMTVJLlKq2mVQRgCYWXfK87klzgFxLQYEogQw/viewform?usp=dialog" target="_blank" rel="noopener">Submit Oral Histories</a>
-    <div class="cp-section-header">Evicting sweeping towing<br><span class="cp-section-by">by Tiny Gray-Garcia of Homefulness and POOR Magazine</span></div>
+    <div class="cp-section-header">Evicting sweeping towing<br><span class="cp-section-by">by Tiny Gray-Garcia of POOR Magazine</span></div>
     <div class="cp-poem">Evicting towing sweeping killing
 Evicting deporting /stealing hoarding
 Sweeping evicting towing killing
@@ -1449,7 +1460,7 @@ function openSeeAllPanel() {
       <td class="td-date">${formatDate(p.operation_start_date)}</td>
       <td class="td-date">${formatDate(p.operation_end_date)}</td>
       <td class="sa-loc">${p.location || '—'}</td>
-      <td><span class="td-dot" style="background:${interventionColor(p.intervention)};display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:5px;opacity:0.85;"></span>${p.intervention || '—'}</td>
+      <td class="sa-intervention"><span class="td-dot" style="background:${interventionColor(p.intervention)};display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;margin-right:5px;opacity:0.85;"></span>${p.intervention || '—'}</td>
       <td class="td-oplen">${p.district || '—'}</td>
       <td class="td-oplen">${p.sensitivity_zone || '—'}</td>
       <td class="td-oplen" style="white-space:nowrap;">${coords}</td>
@@ -1470,21 +1481,23 @@ function openSeeAllPanel() {
 
   body.innerHTML = `
     <div class="sa-section">
-      <button class="sa-toggle" onclick="toggleSeeAll('sa-postings-body','sa-chev-postings')">
+      <button class="sa-toggle" onclick="toggleSeeAll('sa-postings-body','sa-chev-postings','sa-expand-postings')">
         Postings <span class="sa-count">(${filtered.length})</span>
-        <span class="sa-chevron" id="sa-chev-postings">▼</span>
+        <span class="sa-expand-btn" id="sa-expand-postings">Expand</span>
+        <span class="sa-chevron" id="sa-chev-postings">▶</span>
       </button>
-      <div id="sa-postings-body" class="sa-body">
+      <div id="sa-postings-body" class="sa-body hidden">
         <table><thead><tr><th>Start</th><th>End</th><th>Location</th><th>Intervention</th><th>District</th><th>Sens. Zone</th><th>Coordinates</th></tr></thead>
         <tbody>${postingRows}</tbody></table>
       </div>
     </div>
     <div class="sa-section">
-      <button class="sa-toggle" onclick="toggleSeeAll('sa-ops-body','sa-chev-ops')">
+      <button class="sa-toggle" onclick="toggleSeeAll('sa-ops-body','sa-chev-ops','sa-expand-ops')">
         Operations <span class="sa-count">(${ops.length})</span>
-        <span class="sa-chevron" id="sa-chev-ops">▼</span>
+        <span class="sa-expand-btn" id="sa-expand-ops">Expand</span>
+        <span class="sa-chevron" id="sa-chev-ops">▶</span>
       </button>
-      <div id="sa-ops-body" class="sa-body">
+      <div id="sa-ops-body" class="sa-body hidden">
         <table><thead><tr><th>Sweep</th><th>Start</th><th>End</th><th>Days</th><th>Postings</th><th>Locations</th></tr></thead>
         <tbody>${opRows}</tbody></table>
       </div>
@@ -1494,10 +1507,12 @@ function openSeeAllPanel() {
   panel.classList.add('open');
 }
 
-function toggleSeeAll(bodyId, chevId) {
+function toggleSeeAll(bodyId, chevId, expandId) {
   const el = document.getElementById(bodyId);
   el.classList.toggle('hidden');
-  document.getElementById(chevId).textContent = el.classList.contains('hidden') ? '▶' : '▼';
+  const collapsed = el.classList.contains('hidden');
+  document.getElementById(chevId).textContent = collapsed ? '▶' : '▼';
+  document.getElementById(expandId).textContent = collapsed ? 'Expand' : 'Collapse';
 }
 
 function parseTxt(text) {

@@ -227,7 +227,7 @@ header {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-primary);
-  margin-bottom: 32px;
+  margin-bottom: 48px;
   padding-bottom: 16px;
   border-bottom: 2px solid var(--panel-border);
 }
@@ -266,8 +266,9 @@ header {
 }
 
 .cp-submit-btn {
-  display: inline-block;
-  margin: 20px 0 28px;
+  display: block;
+  width: fit-content;
+  margin: 20px auto 48px;
   font-family: var(--font-mono);
   font-size: 13px;
   letter-spacing: 0.12em;
@@ -291,7 +292,7 @@ header {
   font-weight: 400;
   letter-spacing: 0.06em;
   color: var(--text-muted);
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
 .cp-poem {
@@ -1172,6 +1173,7 @@ mapbox-search-box {
 /* ── See All panel ──────────────────────────────────────────────────────── */
 .sa-section { margin-bottom: 8px; }
 
+#content-panel.see-data { width: max-content; min-width: min(560px, 90vw); max-width: calc(100vw - 60px); }
 #content-panel.see-data .content-panel-inner { padding-top: 16px; }
 
 .sa-toggle {
@@ -1206,7 +1208,19 @@ mapbox-search-box {
   letter-spacing: 0.06em;
 }
 
-.sa-chevron { margin-left: auto; font-size: 9px; color: var(--text-muted); }
+.sa-chevron { font-size: 9px; color: var(--text-muted); }
+
+.sa-expand-btn {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+  padding: 2px 7px;
+  border-radius: 2px;
+  margin-left: auto;
+}
 
 .sa-body.hidden { display: none; }
 
@@ -1228,11 +1242,10 @@ mapbox-search-box {
   white-space: nowrap;
 }
 
-.sa-intervention {
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.sa-body tbody td.sa-intervention {
+  width: 260px;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .sa-loc {

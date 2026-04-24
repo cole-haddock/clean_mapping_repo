@@ -11,8 +11,11 @@ clean_mapping_repo/
 things to do:
 
 - oral histories
-- polygon drawing tool
+- polygon drawing tool DONE
 - ? marks for the filters
+- animation 
+- better mobile view
+
 
 
 4 - 22 - 26
