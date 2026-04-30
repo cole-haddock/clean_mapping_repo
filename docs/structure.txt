@@ -6,11 +6,25 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojso
 
+
+4 - 30 - 26
+
+- fix all the filters so that they update the count and the see data button
+- add an export data button
+- move the see data button to replace the oral histories
+- Intervention type buttons to correspond to the colors 
+- move the see data button
+
 4  - 23 - 26
 
 things to do:
 
-- oral histories
+- fix the draw zone so it filters 
+- also fix the see data so it filters
+- add text wrapping to the oral histories
+
+
+oral histories DONE
 - polygon drawing tool DONE
 - ? marks for the filters
 - animation 
