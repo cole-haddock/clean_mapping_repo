@@ -833,7 +833,7 @@ function toggleFocusMode() {
   focusMode = !focusMode;
   const btn = document.getElementById('btn-focus');
   btn.classList.toggle('active', focusMode);
-  btn.textContent = focusMode ? 'Dots Off' : 'Dots On';
+  btn.textContent = focusMode ? 'See Posting Dots' : 'Hide Posting Dots';
   if (!focusMode) {
     showDots();
     if (selectedLocationId !== null) offsetDotsForLocation(selectedLocationId, selectedSweepId);
@@ -962,6 +962,7 @@ function applyJsFilter(features) {
 function applyMayorFilter() {
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 // ── Intervention type filter ──────────────────────────────────────────────
@@ -976,6 +977,7 @@ function toggleIntervention(value) {
   document.getElementById('iv-other').classList.toggle('active',    interventionFilter.has('other'));
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 // ── Council district checkbox filter ─────────────────────────────────────
@@ -1000,6 +1002,7 @@ function applyDistrictFilter() {
 
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 // ── Sensitivity zone filter ───────────────────────────────────────────────
@@ -1013,6 +1016,7 @@ function toggleSensitivityZone(value) {
   document.getElementById('sz-low').classList.toggle('active',  sensitivityFilter.has('Low'));
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 // ── Filter buttons ────────────────────────────────────────────────────────
@@ -1028,6 +1032,7 @@ function setFilter(type) {
 
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 // ── Date range filter ─────────────────────────────────────────────────────
@@ -1037,6 +1042,7 @@ function applyDateFilter() {
 
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 function resetFilters() {
@@ -1203,6 +1209,7 @@ function finishAnimation() {
   updateAnimationDisplay(null);
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 function animSeekStart() {
@@ -1249,6 +1256,7 @@ function clearZone() {
   document.getElementById('zone-results').classList.remove('visible');
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
 }
 
 function finishDrawZone(polygon) {
@@ -1258,6 +1266,7 @@ function finishDrawZone(polygon) {
   document.getElementById('btn-draw-zone').classList.remove('active');
   map.setFilter('dots-layer', buildDotFilter());
   updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
   computeZoneStats(polygon);
 }
 
@@ -1426,7 +1435,13 @@ function closeContentPanel() {
 
 function openSeeAllPanel() {
   const panel = document.getElementById('content-panel');
-  panel.classList.add('see-data');
+  panel.classList.add('see-data', 'open');
+  refreshSeeAllPanel();
+}
+
+function refreshSeeAllPanel() {
+  const panel = document.getElementById('content-panel');
+  if (!panel.classList.contains('open') || !panel.classList.contains('see-data')) return;
   const body  = document.getElementById('content-panel-body');
 
   const filtered = [...applyJsFilter(allDotFeatures)].sort((a, b) =>
@@ -1502,9 +1517,83 @@ function openSeeAllPanel() {
         <tbody>${opRows}</tbody></table>
       </div>
     </div>
+    <div class="sa-export-row">
+      <button class="sa-export-btn" onclick="exportPostingsCSV()">Export Postings</button>
+      <button class="sa-export-btn" onclick="exportOpsCSV()">Export Operations</button>
+    </div>
   `;
+}
 
-  panel.classList.add('open');
+document.addEventListener('filtersChanged', refreshSeeAllPanel);
+
+function downloadCSV(rows, filename) {
+  const csv = rows.map(r =>
+    r.map(v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportPostingsCSV() {
+  const filtered = [...applyJsFilter(allDotFeatures)].sort((a, b) =>
+    (a.properties.operation_start_date || '') < (b.properties.operation_start_date || '') ? -1 : 1
+  );
+  const rows = [['Posting ID', 'Start', 'End', 'Location', 'Intervention', 'District', 'Sensitivity Zone', 'Latitude', 'Longitude', 'Sweep ID']];
+  filtered.forEach(f => {
+    const p   = f.properties;
+    const lat = p.load_lat != null ? p.load_lat : f.geometry.coordinates[1];
+    const lon = p.load_lon != null ? p.load_lon : f.geometry.coordinates[0];
+    rows.push([
+      p.posting_id           ?? '',
+      p.operation_start_date || '',
+      p.operation_end_date   || '',
+      p.location             || '',
+      p.intervention         || '',
+      p.district             || '',
+      p.sensitivity_zone     || '',
+      lat != null ? Number(lat).toFixed(6) : '',
+      lon != null ? Number(lon).toFixed(6) : '',
+      p.sweep_event_id       || '',
+    ]);
+  });
+  downloadCSV(rows, 'oakland-encampment-postings.csv');
+}
+
+function exportOpsCSV() {
+  const filtered = applyJsFilter(allDotFeatures);
+  const opMap = {};
+  filtered.forEach(f => {
+    const p   = f.properties;
+    const sid = p.sweep_event_id;
+    if (!sid) return;
+    if (!opMap[sid]) opMap[sid] = { sid, min: null, max: null, postings: 0, locs: new Set(), postingIds: new Set() };
+    const s = new Date(p.operation_start_date);
+    const e = new Date(p.operation_end_date);
+    if (!opMap[sid].min || s < opMap[sid].min) opMap[sid].min = s;
+    if (!opMap[sid].max || e > opMap[sid].max) opMap[sid].max = e;
+    opMap[sid].postings++;
+    opMap[sid].locs.add(p.unique_location_id);
+    if (p.posting_id != null) opMap[sid].postingIds.add(p.posting_id);
+  });
+  const rows = [['Sweep ID', 'Start', 'End', 'Days', 'Postings', 'Unique Locations', 'Posting IDs']];
+  Object.values(opMap).sort((a, b) => a.min - b.min).forEach(op => {
+    const days = op.min && op.max ? Math.round((op.max - op.min) / 86400000) + 1 : 1;
+    rows.push([
+      op.sid,
+      op.min ? op.min.toISOString().slice(0, 10) : '',
+      op.max ? op.max.toISOString().slice(0, 10) : '',
+      days,
+      op.postings,
+      op.locs.size,
+      [...op.postingIds].sort((a, b) => a - b).join('; '),
+    ]);
+  });
+  downloadCSV(rows, 'oakland-encampment-operations.csv');
 }
 
 function toggleSeeAll(bodyId, chevId, expandId) {

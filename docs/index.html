@@ -16,14 +16,13 @@
   <!-- ── Header ───────────────────────────────────────────────────── -->
   <header>
     <div class="header-title">Oakland Encampment Closures</div>
-    <div class="counts-center">
-      <span class="counts-date" id="date-range">—</span>
-      <span class="counts-dot">·</span>
-      <span class="counts-stats"><span id="dot-count">—</span> postings &nbsp;/&nbsp; <span id="op-count">—</span> operations</span>
-    </div>
     <div class="header-right">
-      <mapbox-search-box id="search-box"></mapbox-search-box>
-      <div class="header-byline">Street Spirit News</div>
+      <div class="counts-center">
+        <span class="counts-stats"><span id="dot-count">—</span> postings &nbsp;—&nbsp; <span id="op-count">—</span> operations</span>
+        <span class="counts-date" id="date-range">—</span>
+      </div>
+      <div class="header-divider"></div>
+      <a href="https://thestreetspirit.org/" target="_blank" rel="noopener"><img src="data/ss_logo.png" class="header-logo" alt="Street Spirit News" /></a>
     </div>
   </header>
 
@@ -38,7 +37,7 @@
         <button class="ls-nav-btn" onclick="openComingSoonPanel('Introduction')">Introduction</button>
         <button class="ls-nav-btn" onclick="openComingSoonPanel('Analysis')">Analysis</button>
         <button class="ls-nav-btn" onclick="openComingSoonPanel('Methodologies')">Methodologies</button>
-        <button class="ls-nav-btn" onclick="openSeeAllPanel()">See Data</button>
+        <button class="ls-nav-btn" onclick="openSeeAllPanel()">Data</button>
 
         <div class="ls-divider"></div>
         <button class="ls-section-header" onclick="openOralHistoriesPanel()">Oral Histories</button>
@@ -49,6 +48,11 @@
             Map Filters <span class="ls-chevron closed" id="filters-chevron">▼</span>
           </button>
           <div class="ls-section-body closed" id="filters-body">
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Find a Location</div>
+              <mapbox-search-box id="search-box"></mapbox-search-box>
+            </div>
 
             <div class="ls-filter-group">
               <div class="ls-filter-label">Time Range</div>
@@ -202,10 +206,6 @@
 
       </div>
 
-      <div class="left-sidebar-footer">
-        <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">Dots Off</button>
-      </div>
-
       <button class="left-sidebar-toggle" onclick="toggleLeftSidebar()">
         <span class="left-toggle-arrow">◀</span>
       </button>
@@ -230,6 +230,10 @@
           <div class="summary-count" id="sb-ops">0</div>
           <div class="summary-label">operations at this location</div>
         </div>
+      </div>
+
+      <div class="sb-focus-wrap">
+        <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">See Posting Dots</button>
       </div>
 
       <div class="table-wrap">
@@ -266,38 +270,40 @@
     <!-- Oral History Button -->
     <a class="oral-history-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSffifZMZL6kkHMTVJLlKq2mVQRgCYWXfK87klzgFxLQYEogQw/viewform?usp=dialog" target="_blank" rel="noopener">Submit Oral Histories</a>
 
-
-    <!-- Legend -->
-    <div id="legend" onclick="toggleLegend()">
-      <div class="legend-header">
-        Legend <span class="legend-chevron">▲</span>
+    <!-- Legend + See Data -->
+    <div class="legend-stack">
+      <div id="legend" onclick="toggleLegend()">
+        <div class="legend-header">
+          Legend <span class="legend-chevron">▲</span>
+        </div>
+        <div class="legend-body">
+          <div class="legend-row">
+            <div class="legend-swatch" style="background:#5d0000; opacity:1;"></div>
+            Selected Location
+          </div>
+          <div class="legend-row">
+            <div class="legend-swatch" style="background:#ac0000; opacity:0.85;"></div>
+            Operation Area
+          </div>
+          <div class="legend-row">
+            <div class="legend-swatch" style="background:#343131; opacity:0.35;"></div>
+            Closed Area
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:#ac0000;"></div>
+            Closure
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:#5c2d6e;"></div>
+            Deep Cleaning
+          </div>
+          <div class="legend-row">
+            <div class="legend-dot" style="background:#4a5568;"></div>
+            Other
+          </div>
+        </div>
       </div>
-      <div class="legend-body">
-        <div class="legend-row">
-          <div class="legend-swatch" style="background:#5d0000; opacity:1;"></div>
-          Selected Location
-        </div>
-        <div class="legend-row">
-          <div class="legend-swatch" style="background:#ac0000; opacity:0.85;"></div>
-          Operation Area
-        </div>
-        <div class="legend-row">
-          <div class="legend-swatch" style="background:#343131; opacity:0.35;"></div>
-          Closed Area
-        </div>
-        <div class="legend-row">
-          <div class="legend-dot" style="background:#ac0000;"></div>
-          Closure
-        </div>
-        <div class="legend-row">
-          <div class="legend-dot" style="background:#5c2d6e;"></div>
-          Deep Cleaning
-        </div>
-        <div class="legend-row">
-          <div class="legend-dot" style="background:#4a5568;"></div>
-          Other
-        </div>
-      </div>
+      <button class="see-data-map-btn" onclick="openSeeAllPanel()">See Data</button>
     </div>
   </div>
 
