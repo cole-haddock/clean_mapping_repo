@@ -65,7 +65,7 @@
 
             <div class="ls-filter-group">
               <div class="ls-filter-label">Grants Pass v. Johnson <button class="ls-info-btn" onclick="toggleInfoTip('gp-tip')" aria-label="What is Grants Pass?">?</button></div>
-              <div class="ls-info-tip" id="gp-tip">The Supreme Court's <em>City of Grants Pass v. Johnson</em> (2024) ruling allowed state and local governments to cite, arrest, or evict unhoused people for living in public without first offering them housing. After the ruling, Governor Newsom urged California officials to push forward with aggressive encampment clearances, saying, "Time to do your job."</div>
+              <div class="ls-info-tip" id="gp-tip">The Supreme Court's <em>City of Grants Pass v. Johnson</em> (2024) ruling allowed state and local governments to cite or arrest unhoused people for living in public without first offering them shelter. After the ruling was announced, Governor Gavin Newsom urged California officials to push forward with encampment closures, ushering in a wave of new anti-camping policies across the state.</div>
               <div class="ls-toggle-row">
                 <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
                 <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
@@ -145,12 +145,13 @@
                     <tr><td><input type="checkbox" id="district-7" onchange="applyDistrictFilter()" /></td><td>District 7</td><td id="district-count-7">—</td></tr>
                   </tbody>
                 </table>
+                <p class="ls-filter-note">Oakland redrew its council districts in 2022. This leads to some instances where a posting falls outside of current district boundaries.</p>
               </div>
             </div>
 
             <div class="ls-filter-group">
               <div class="ls-filter-label">Sensitivity Zone <button class="ls-info-btn" onclick="toggleInfoTip('sz-tip')" aria-label="What is a sensitivity zone?">?</button></div>
-              <div class="ls-info-tip" id="sz-tip">Oakland's Encampment Abatement Policy divides the city into high-sensitivity and low-sensitivity zones. High-sensitivity zones — near critical infrastructure like traffic lanes and schools — make up more than 90% of the city. In low-sensitivity zones, encampments can stay if they meet strict city requirements.</div>
+              <div class="ls-info-tip" id="sz-tip">Oakland's Encampment Abatement Policy divides the city into high-sensitivity and low-sensitivity zones. In high-sensitivity zones — locations near critical infrastructure such as traffic lanes and schools — encampments are prioritized for closure. Encampments are not prioritized for closure in low-sensitivity zones as long as they adhere to a set of strict requirements.</div>
               <div class="ls-toggle-row">
                 <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
                 <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
@@ -159,7 +160,7 @@
 
             <div class="ls-filter-group">
               <div class="ls-filter-label">Intervention Type <button class="ls-info-btn" onclick="toggleInfoTip('iv-tip')" aria-label="What are intervention types?">?</button></div>
-              <div class="ls-info-tip" id="iv-tip">There are five types of interventions: Full Closures, Health &amp; Hygiene interventions, Deep Cleanings, Partial Closures, and Emergency Closures. Since 2024, the City of Oakland has focused almost entirely on full closures.</div>
+              <div class="ls-info-tip" id="iv-tip">There are five types of encampment interventions captured in this dataset: Full Closures, Health &amp; Hygiene interventions, Deep Cleanings, Partial Closures, and Emergency Closures. Since 2024, the City of Oakland has focused almost entirely on full closures.</div>
               <div class="ls-toggle-row">
                 <button class="ls-toggle-btn" id="iv-closure"  onclick="toggleIntervention('closure')">Closure</button>
                 <button class="ls-toggle-btn" id="iv-cleaning" onclick="toggleIntervention('cleaning')">Deep Cleaning</button>
@@ -202,7 +203,7 @@
 
         <div class="ls-divider"></div>
 
-        <a class="ls-nav-btn" href="https://thestreetspirit.org/article_author/cole-haddock-and-maria-toldi/" target="_blank" rel="noopener">About Us</a>
+        <button class="ls-nav-btn" onclick="openAboutUsPanel()">About Us</button>
 
       </div>
 

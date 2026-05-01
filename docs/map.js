@@ -1,3 +1,7 @@
+if (document.referrer) {
+  document.getElementById('intro-overlay').classList.add('hidden');
+}
+
 function toggleInfoTip(id) {
   const tip = document.getElementById(id);
   const btn = tip.previousElementSibling.querySelector('.ls-info-btn');
@@ -1402,6 +1406,52 @@ Only earns
 Evicting sweeping towing killing
 Evicting deporting /stealing drilling
 Evicting sweeping towing killing</div>
+  `;
+  panel.classList.add('open');
+}
+
+function openAboutUsPanel() {
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  body.innerHTML = `
+    <img src="data/mesro_logo.png" class="au-logo" alt="MESRO" />
+    <div class="cp-title">About the Project</div>
+    <p class="cp-p"><em>Swept Off the Map</em> is a seven-month investigation into the scope and scale of encampment sweeps in Berkeley, Richmond and Oakland. This map is one of five published pieces that comprise this investigation. The other pieces include: a guide to homeless management in all three cities, a community profile of an encampment in Berkeley at risk of getting swept out, a piece about how sweeps affect LifeLong Street Medicine, and a profile of RV residents in Richmond at risk of getting towed. All pieces are published with Street Spirit.</p>
+    <a class="cp-submit-btn" href="#" target="_blank" rel="noopener">Project Website</a>
+
+    <div class="cp-section-header">About the Authors</div>
+    <p class="cp-p"><strong>Cole Haddock and Maria Toldi</strong> are journalists and researchers whose collaborative work centers on homelessness, displacement, and community resilience in the Bay Area. Their partnership began in 2023 producing the documentary <em>Unhoused and Unseen</em> for San Quentin News, and has continued through ongoing collaborations with Street Spirit. Over the past three years, their work has centered on dignifying and respectful journalism, mutual aid, and collaborative storytelling.</p>
+    <p class="cp-p"><strong>Cole Haddock</strong> is a graduate of the Geography Department of the University of California, Berkeley and the Human Rights Center at UC Berkeley Law. He will work this summer as a daily news reporter for the Daily Sitka Sentinel in Alaska.</p>
+    <p class="cp-p"><strong>Maria Toldi</strong> graduated from University of California, Berkeley in 2025, where she earned her degree in Interdisciplinary Research Studies with a minor in Political Economy. Her academic work has integrated sociology, public policy, ethnic studies, and psychology to critically examine structural inequality and systems of social control.</p>
+
+    <div class="cp-section-header">The Judith Lee Stronach Prize</div>
+    <p class="cp-p">This project was fully funded by UC Berkeley's Judith Lee Stronach Baccalaureate Prize, which supports intellectual and creative pursuits that heighten awareness of issues of social consciousness and contribute to the public good.</p>
+
+    <div class="cp-section-header">Advisors</div>
+    <div class="au-advisor-name">Alastair Boone</div>
+    <div class="au-advisor-role">Director of Street Spirit newspaper and KALW Beat Reporter</div>
+    <p class="cp-p">Alastair led the editorial oversight for Swept Off the Map. She provided project management, edited individual stories, provided a framework for ethical reporting and fact-checking, and offered subject matter expertise.</p>
+    <div class="au-advisor-name">Dr. Desiree Fields</div>
+    <div class="au-advisor-role">UC Berkeley Geography Department Chair</div>
+    <p class="cp-p">Dr. Fields offered editorial support and guidance on research methods.</p>
+    <div class="au-advisor-name">Georgia von Minden</div>
+    <div class="au-advisor-role">Adjunct Professor at University of San Francisco</div>
+    <p class="cp-p">Georgia provided computer science guidance for Swept Off the Map. She taught proper data and code organization standards, as well as assisted with fact-checking.</p>
+
+    <div class="cp-section-header">Community Partners</div>
+    <p class="cp-p"><span class="au-inline-name">SOS Richmond</span> is a community-rooted nonprofit serving Richmond, CA, where unhoused and housed community members collaborate to address homelessness. They operate a wellness center and resource center to offer job support, food and clothing access, laundry services, and direct connections to essential county services. SOS Richmond also delivers hands-on encampment services, including mobile showers, trash pickup, portable toilets, and other supplies. Cole and Maria brought breakfast to the SOS Richmond warehouse nearly every week during their wellness center hours and talked about the Street Spirit newspaper with potential authors, vendors, and readers.</p>
+    <p class="cp-p"><span class="au-inline-name">Episcopal Church of the Good Shepherd</span> is a historic congregation in West Berkeley, with a long and deeply rooted commitment to serving its surrounding community — from hosting an early Black Panthers' breakfast program for schoolchildren to developing a prototype of the Head Start Program. Today, the church has an active food pantry and weekly food program. Since fall 2024, Cole and Maria have partnered with Good Shepherd for their food program, delivering 120 lunches weekly (more than 9,000 in total) to day laborers and encampment residents in the East Bay.</p>
+
+    <div class="cp-section-header">Special Thanks</div>
+    <p class="au-thanks-item"><span class="au-inline-name">Wali Henderson</span> — <em>San Quentin News</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Yesica Prado</span> — <em>El Tecolote</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Paul Kealoha-Blake</span> — <em>Consider the Homeless</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Kelsey Hubbard</span> — <em>Oakland Revealed</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Brigitte Nicoletti</span> — <em>East Bay Community Law</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Osha Neumann</span> — <em>East Bay Community Law</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Jessica Lin-Tupas</span> — <em>U.C. Berkeley</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Dr. Alexa Koenig</span> — <em>Human Rights Center</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Japjot Sethi</span> — <em>Free Meals on Wheels</em> and <em>Good Karma Water</em></p>
   `;
   panel.classList.add('open');
 }
