@@ -88,7 +88,8 @@ window.addEventListener('load', () => {
   searchBox.options = {
     language:  'en',
     country:   'US',
-    proximity: { lng: -122.2712, lat: 37.8044 },  // bias toward Oakland
+    proximity: { lng: -122.2712, lat: 37.8044 },
+    bbox:      [-122.55, 37.60, -121.85, 37.95],   // restrict to East Bay
   };
   searchBox.bindMap(map);
 });
@@ -1083,6 +1084,15 @@ function resetFilters() {
 // ── Animation ─────────────────────────────────────────────────────────────
 function initAnimationDateInputs() {
   const { min, max } = getDatasetDateRange();
+
+  // Restrict all four date pickers to the dataset's actual date range
+  ['ls-date-from', 'ls-date-to', 'anim-date-from', 'anim-date-to'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.min = min;
+    el.max = max;
+  });
+
   const fromEl = document.getElementById('anim-date-from');
   const toEl   = document.getElementById('anim-date-to');
   if (fromEl && !fromEl.value) fromEl.value = min;
@@ -1239,7 +1249,7 @@ function startDrawZone() {
   draw.deleteAll();
   activeZonePolygon = null;
   document.getElementById('zone-results').classList.remove('visible');
-  document.getElementById('btn-draw-zone').textContent = 'Cancel Drawing';
+  document.getElementById('btn-draw-zone').textContent = 'Draw polygon then press Enter';
   document.getElementById('btn-draw-zone').classList.add('active');
   drawingActive = true;
   draw.changeMode('draw_polygon');
@@ -1327,7 +1337,7 @@ function updateCounts(features) {
     .sort();
   if (dates.length) {
     const fmt = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-    document.getElementById('date-range').textContent = `${fmt(dates[0])} – ${fmt(dates[dates.length - 1])}`;
+    document.getElementById('date-range').textContent = `${fmt(dates[0])}  —  ${fmt(dates[dates.length - 1])}`;
   } else {
     document.getElementById('date-range').textContent = '—';
   }

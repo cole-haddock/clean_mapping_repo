@@ -9,11 +9,40 @@ clean_mapping_repo/
 
 4 - 30 - 26
 
-- fix all the filters so that they update the count and the see data button
-- add an export data button
+- fix all the filters so that they update the count and the see data button automatically
+- add an export data button 
 - move the see data button to replace the oral histories
 - Intervention type buttons to correspond to the colors 
 - move the see data button
+- get rid of the header page
+- add mesro's logo to the about us
+= add street spirit logo
+- add the about us page to mirror the website
+- try out a different logo for the title
+- dots off button
+- update the grants pass text and the rest of them 
+- Add a note to council districts: oakland redrew its council districts in 2022. This leads 
+to some instances where a posting falls outside of current district boundaries. 
+- Fix the scrolling when they are all expanded
+- Fix it so that if you pause the animation and then click anything else they don't stay highlighted
+- Dum down the animation so that there's only three buttons 
+- The map is blank at the beginning of every time range (doesn't call the past dots)
+- restrict search bar to only search oakland locations
+- restrict calendar to only dates within the dataset
+- Draw zone - when clicked, it should say draw polygon then press enter
+- See postings on the right instead of Dots on or off
+- If time: make mobile better
+
+
+
+
+
+
+
+
+
+
+
 
 4  - 23 - 26
 

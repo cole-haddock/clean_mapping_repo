@@ -762,7 +762,7 @@ tbody td.td-oplen-long {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
-  padding: 10px 4px;
+  padding: 10px 4px 10px 20px;
   cursor: pointer;
 }
 
@@ -842,7 +842,7 @@ a.ls-nav-btn { text-decoration: none; }
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-primary);
   padding-bottom: 7px;
   margin-bottom: 12px;
   border-bottom: 1px solid var(--panel-border);
