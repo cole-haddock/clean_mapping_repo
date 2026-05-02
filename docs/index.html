@@ -36,11 +36,11 @@
 
         <button class="ls-nav-btn" onclick="openComingSoonPanel('Introduction')">Introduction</button>
         <button class="ls-nav-btn" onclick="openComingSoonPanel('Analysis')">Analysis</button>
-        <button class="ls-nav-btn" onclick="openComingSoonPanel('Methodologies')">Methodologies</button>
+        <button class="ls-nav-btn" onclick="openMethodologiesPanel()">Methodologies</button>
         <button class="ls-nav-btn" onclick="openSeeAllPanel()">Data</button>
 
         <div class="ls-divider"></div>
-        <button class="ls-nav-btn" onclick="openOralHistoriesPanel()">Oral Histories</button>
+        <button class="ls-nav-btn ls-nav-btn--red" onclick="openOralHistoriesPanel()">Oral Histories</button>
         <div class="ls-divider"></div>
 
         <button class="ls-nav-btn" id="btn-map-filters" onclick="toggleFiltersPanel()">Map Filters</button>
@@ -58,8 +58,10 @@
 
     <!-- Filters Panel -->
     <div id="filters-panel">
-      <button class="sidebar-close" onclick="toggleFiltersPanel()">✕</button>
-      <div class="fp-title">Map Filters</div>
+      <div class="fp-title">
+        Map Filters
+        <button class="fp-close-btn" onclick="toggleFiltersPanel()">✕</button>
+      </div>
       <div class="fp-action-row">
         <button class="fp-action-btn" onclick="openSeeAllPanel()">See Data</button>
         <button class="fp-action-btn fp-reset-btn" id="btn-reset-filters" onclick="resetFilters()">Reset Filters</button>
@@ -256,10 +258,7 @@
       </div>
     </div>
 
-    <!-- Oral History Button -->
-    <a class="oral-history-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSffifZMZL6kkHMTVJLlKq2mVQRgCYWXfK87klzgFxLQYEogQw/viewform?usp=dialog" target="_blank" rel="noopener">Submit Oral Histories</a>
-
-    <!-- Legend + See Data -->
+<!-- Legend + See Data -->
     <div class="legend-stack">
       <div id="legend" onclick="toggleLegend()">
         <div class="legend-header">
@@ -294,6 +293,9 @@
       </div>
     </div>
   </div>
+
+  <!-- Modal backdrop -->
+  <div id="modal-backdrop" onclick="closeContentPanel()"></div>
 
   <!-- Content Panel — outside map-wrap to avoid canvas layout interference -->
   <div id="content-panel">

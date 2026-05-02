@@ -1451,7 +1451,16 @@ function updateDistrictCounts() {
 }
 
 // ── Content panel ─────────────────────────────────────────────────────────
+function closeFiltersForContentPanel() {
+  const fp = document.getElementById('filters-panel');
+  if (fp.classList.contains('open')) {
+    fp.classList.remove('open');
+    document.getElementById('btn-map-filters').classList.remove('active');
+  }
+}
+
 function openOralHistoriesPanel() {
+  closeFiltersForContentPanel();
   const panel = document.getElementById('content-panel');
   const body  = document.getElementById('content-panel-body');
   body.innerHTML = `
@@ -1517,6 +1526,7 @@ Evicting sweeping towing killing</div>
 }
 
 function openAboutUsPanel() {
+  closeFiltersForContentPanel();
   const panel = document.getElementById('content-panel');
   const body  = document.getElementById('content-panel-body');
   body.innerHTML = `
@@ -1563,12 +1573,83 @@ function openAboutUsPanel() {
 }
 
 function openComingSoonPanel(title) {
+  closeFiltersForContentPanel();
   const panel = document.getElementById('content-panel');
   const body  = document.getElementById('content-panel-body');
   body.innerHTML = `
     <div class="cp-title">${title}</div>
     <p class="cp-p">Coming Soon.</p>
   `;
+  panel.classList.add('modal-panel');
+  panel.getBoundingClientRect();
+  panel.classList.add('open');
+}
+
+function toggleAccordion(id) {
+  const body = document.getElementById(id);
+  const chev = document.getElementById(id + '-chev');
+  const open = body.classList.toggle('open');
+  if (chev) chev.textContent = open ? '▲' : '▼';
+}
+
+function openMethodologiesPanel() {
+  closeFiltersForContentPanel();
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  panel.classList.add('modal-panel');
+  body.innerHTML = `
+    <div class="meth-panel">
+    <div class="cp-title">Methodologies</div>
+
+    <div class="cp-accordion">
+      <button class="cp-acc-header" onclick="toggleAccordion('meth-1')">
+        Terminology <span class="cp-acc-chevron" id="meth-1-chev">▼</span>
+      </button>
+      <div class="cp-acc-body" id="meth-1">
+        <p class="cp-p">Often, people refer to encampment closures as <em>sweeps</em>. We struggled to align these words with clear definitions for the purposes of our project. If two tents next to each other are removed on the same day, is that one sweep or two? If a large community is removed, is that one large sweep, or many small ones? There are also a range of sweeps not represented in this dataset at all — for example, move-along orders, or sweeps performed by CalTrans or private agencies. For these reasons, Street Spirit elected instead to utilize the words <strong>closures</strong>, <strong>postings</strong>, and <strong>operations</strong>.</p>
+        <p class="cp-p">A <strong>closure</strong> aligns with what is laid out in Oakland's Encampment Abatement Policy: when officials from the city's Encampment Management Abatement Team physically shut down and clear an encampment site. Before a closure, workers print flyers — generally called "pink slips," "pink tags," or "red tags" (red tags typically refer to RVs or cars at risk of being towed) — and tape them to tents, vehicles, and structures in the area. These announce that public works officials will arrive to close a specific area on a specific date.</p>
+        <p class="cp-p">In the City's dataset, each new closure record corresponds to a new location, even if they are adjoining streets closed on the same day. The number therefore reflects how many different flyers the City printed and posted, rather than how many separate closures were necessarily conducted. For this reason, we refer to the city's records as <strong>postings</strong>.</p>
+        <p class="cp-p">Our analysis groups postings together to form <strong>continuous operations</strong> when they are geographically proximate and occur within a continuous time frame. There are 2,201 postings in the City's dataset, which we have aggregated into 791 operations.</p>
+        <p class="cp-p">There are five types of encampment interventions described in the Encampment Management Policy, ranging from <em>Health &amp; Hygiene</em> (routine sanitation) to <em>Deep Cleanings</em> (temporary displacement while an area is cleaned). <em>Partial Closures</em> permanently close one section of an encampment while residents largely remain. <em>Full Closures</em> describe a complete and permanent closure, where re-encampment is prohibited. <em>Emergency Closures</em> are the same as Full Closures but can happen without the standard noticing procedures. Almost 80% of records in this dataset represent Full Closures. Our data is organized into "Full Closure," "Deep Cleaning," and "Other."</p>
+      </div>
+    </div>
+
+    <div class="cp-accordion">
+      <button class="cp-acc-header" onclick="toggleAccordion('meth-2')">
+        What this dataset doesn't capture <span class="cp-acc-chevron" id="meth-2-chev">▼</span>
+      </button>
+      <div class="cp-acc-body" id="meth-2">
+        <p class="cp-p">We have worked to analyze this dataset accurately based on its own lexicon of terms and activities. However, it does not capture the full picture of encampment management in Oakland. This data does not tell us:</p>
+        <ul class="cp-list">
+          <li>How many people live in the encampments being closed</li>
+          <li>How many people are offered shelter</li>
+          <li>If belongings were thrown away, and if so, what belongings</li>
+          <li>Whether property is stored or returned</li>
+          <li>Whether anyone is arrested</li>
+          <li>Whether anyone was sent to the hospital</li>
+          <li>Whether anyone was injured</li>
+          <li>How long an encampment has been present at the targeted location</li>
+        </ul>
+        <p class="cp-p">As the new Encampment Management Abatement Plan is enacted, this dataset will also omit all vehicle towings.</p>
+        <p class="cp-p">It is important to note that this dataset is often the only existing public record of these actions — there are frequently no photos, videos, or testimonies of encampment closures. To better understand the data, we were guided by six months of research, on-the-ground reporting, and interviews with unhoused people and others who have been present during closures.</p>
+      </div>
+    </div>
+
+    <div class="cp-accordion">
+      <button class="cp-acc-header" onclick="toggleAccordion('meth-3')">
+        Data processing steps <span class="cp-acc-chevron" id="meth-3-chev">▼</span>
+      </button>
+      <div class="cp-acc-body" id="meth-3">
+        <p class="cp-p">To make this map, we utilized: VSCode, QGIS, Mapbox, Google API, OpenStreetMaps API, Google Earth, and Claude.</p>
+        <p class="cp-p"><strong>Step 1 — Downloading.</strong> The most recent data was downloaded from the City of Oakland Data portal, which we check regularly for updates.</p>
+        <p class="cp-p"><strong>Step 2 — Cleaning.</strong> Location strings are cleaned and made to follow a uniform format. Locations are separated into "betweens" (street segments between two intersections, e.g. "MLK Between 45th and 46th") and "others" (parks, landmarks). Each "between" is converted into two intersection points and run through the Google API to return lat/long pairs. The OSM Roads network is then used to draw a road segment between those coordinates. Lines are exported into QGIS and cleaned manually. Non-street locations like parks are manually drawn as polygons in Google Earth.</p>
+        <p class="cp-p"><strong>Step 3 — Aggregating postings into operations.</strong> Postings are first clustered geographically using a DBSCAN algorithm, which assigns each posting a location cluster id. Within each cluster, postings are grouped by time — consecutive dates (excluding weekends and holidays) are merged into a single operation. Each posting receives an operation id in the format XX_XX. After automated clustering, our team manually verified each operation, correcting cases where blocks were too far apart to cluster despite being continuous, or where infrastructure like bridges created false geographic proximity. This process produced 791 unique operations.</p>
+        <p class="cp-p"><strong>Step 4 — Mapping.</strong> We chose a color and font scheme to evoke old East Bay newspapers, using Mapbox Monochrome as the basemap. All polygons and lines were hand-verified. Many locations overlap in the dataset, as the street sections themselves overlap. The site is hosted on GitHub.</p>
+      </div>
+    </div>
+    </div>
+  `;
+  panel.getBoundingClientRect();
   panel.classList.add('open');
 }
 
@@ -1587,11 +1668,14 @@ function closeContentPanel() {
   const panel = document.getElementById('content-panel');
   panel.classList.remove('open');
   panel.classList.remove('see-data');
+  panel.classList.remove('modal-panel');
 }
 
 function openSeeAllPanel() {
   const panel = document.getElementById('content-panel');
-  panel.classList.add('see-data', 'open');
+  panel.classList.add('see-data');
+  panel.getBoundingClientRect();
+  panel.classList.add('open');
   refreshSeeAllPanel();
 }
 
