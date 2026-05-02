@@ -1,7 +1,3 @@
-if (document.referrer) {
-  document.getElementById('intro-overlay').classList.add('hidden');
-}
-
 function toggleInfoTip(id) {
   const tip = document.getElementById(id);
   const btn = tip.previousElementSibling.querySelector('.ls-info-btn');
@@ -847,12 +843,18 @@ function toggleLegend() {
 }
 
 function toggleLeftSidebar() {
-  document.getElementById('left-sidebar').classList.toggle('open');
+  const sidebar = document.getElementById('left-sidebar');
+  sidebar.classList.toggle('open');
+  if (!sidebar.classList.contains('open')) {
+    document.getElementById('filters-panel').classList.remove('open');
+    document.getElementById('btn-map-filters').classList.remove('active');
+  }
 }
 
 function toggleFiltersPanel() {
-  document.getElementById('filters-body').classList.toggle('closed');
-  document.getElementById('filters-chevron').classList.toggle('closed');
+  const panel = document.getElementById('filters-panel');
+  panel.classList.toggle('open');
+  document.getElementById('btn-map-filters').classList.toggle('active', panel.classList.contains('open'));
 }
 
 function toggleMayorsPanel() {
@@ -1679,6 +1681,23 @@ function refreshSeeAllPanel() {
 }
 
 document.addEventListener('filtersChanged', refreshSeeAllPanel);
+document.addEventListener('filtersChanged', updateResetBtn);
+
+function updateResetBtn() {
+  const anyActive =
+    activeFilter !== 'all' ||
+    dateFrom !== null ||
+    dateTo !== null ||
+    sensitivityFilter.size > 0 ||
+    districtFilter.size > 0 ||
+    interventionFilter.size > 0 ||
+    minOpLength !== null ||
+    minOpPostings !== null ||
+    activeZonePolygon !== null ||
+    getCheckedMayors().length < MAYOR_TERMS.length;
+  const btn = document.getElementById('btn-reset-filters');
+  if (btn) btn.classList.toggle('active', anyActive);
+}
 
 function downloadCSV(rows, filename) {
   const csv = rows.map(r =>

@@ -40,182 +40,10 @@
         <button class="ls-nav-btn" onclick="openSeeAllPanel()">Data</button>
 
         <div class="ls-divider"></div>
-        <button class="ls-section-header" onclick="openOralHistoriesPanel()">Oral Histories</button>
+        <button class="ls-nav-btn" onclick="openOralHistoriesPanel()">Oral Histories</button>
         <div class="ls-divider"></div>
 
-        <div class="ls-section">
-          <button class="ls-section-header" onclick="toggleFiltersPanel()">
-            Map Filters <span class="ls-chevron closed" id="filters-chevron">▼</span>
-          </button>
-          <div class="ls-section-body closed" id="filters-body">
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Find a Location</div>
-              <mapbox-search-box id="search-box"></mapbox-search-box>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Time Range</div>
-              <div class="ls-time-inputs">
-                <input class="ls-date-input" type="date" id="ls-date-from" oninput="applyDateFilter()" />
-                <span class="ls-date-sep">–</span>
-                <input class="ls-date-input" type="date" id="ls-date-to" oninput="applyDateFilter()" />
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Grants Pass v. Johnson <button class="ls-info-btn" onclick="toggleInfoTip('gp-tip')" aria-label="What is Grants Pass?">?</button></div>
-              <div class="ls-info-tip" id="gp-tip">The Supreme Court's <em>City of Grants Pass v. Johnson</em> (2024) ruling allowed state and local governments to cite or arrest unhoused people for living in public without first offering them shelter. After the ruling was announced, Governor Gavin Newsom urged California officials to push forward with encampment closures, ushering in a wave of new anti-camping policies across the state.</div>
-              <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
-                <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <button class="ls-mayor-header" onclick="toggleMayorsPanel()">
-                Mayoral Terms <span class="ls-chevron" id="mayors-chevron">▼</span>
-              </button>
-              <div class="ls-section-body closed" id="mayors-body">
-                <table class="ls-mayor-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Mayor</th>
-                      <th>Term Start</th>
-                      <th>Term End</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><input type="checkbox" id="mayor-schaaf" checked onchange="applyMayorFilter()" /></td>
-                      <td>Schaaf</td>
-                      <td>Jan 2015</td>
-                      <td>Jan 2023</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" id="mayor-thao" checked onchange="applyMayorFilter()" /></td>
-                      <td>Thao</td>
-                      <td>Jan 2023</td>
-                      <td>Dec 2024</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" id="mayor-bas" checked onchange="applyMayorFilter()" /></td>
-                      <td>Fortunato Bas</td>
-                      <td>Dec 2024</td>
-                      <td>Jan 2025</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" id="mayor-jenkins" checked onchange="applyMayorFilter()" /></td>
-                      <td>Jenkins</td>
-                      <td>Jan 2025</td>
-                      <td>May 2025</td>
-                    </tr>
-                    <tr>
-                      <td><input type="checkbox" id="mayor-lee" checked onchange="applyMayorFilter()" /></td>
-                      <td>Lee</td>
-                      <td>May 2025</td>
-                      <td>Present</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <button class="ls-mayor-header" onclick="toggleDistrictsPanel()">
-                Council Districts <span class="ls-chevron" id="districts-chevron">▼</span>
-              </button>
-              <div class="ls-section-body closed" id="districts-body">
-                <table class="ls-mayor-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>District</th>
-                      <th>Postings</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td><input type="checkbox" id="district-1" onchange="applyDistrictFilter()" /></td><td>District 1</td><td id="district-count-1">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-2" onchange="applyDistrictFilter()" /></td><td>District 2</td><td id="district-count-2">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-3" onchange="applyDistrictFilter()" /></td><td>District 3</td><td id="district-count-3">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-4" onchange="applyDistrictFilter()" /></td><td>District 4</td><td id="district-count-4">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-5" onchange="applyDistrictFilter()" /></td><td>District 5</td><td id="district-count-5">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-6" onchange="applyDistrictFilter()" /></td><td>District 6</td><td id="district-count-6">—</td></tr>
-                    <tr><td><input type="checkbox" id="district-7" onchange="applyDistrictFilter()" /></td><td>District 7</td><td id="district-count-7">—</td></tr>
-                  </tbody>
-                </table>
-                <p class="ls-filter-note">Oakland redrew its council districts in 2022. This leads to some instances where a posting falls outside of current district boundaries.</p>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Sensitivity Zone <button class="ls-info-btn" onclick="toggleInfoTip('sz-tip')" aria-label="What is a sensitivity zone?">?</button></div>
-              <div class="ls-info-tip" id="sz-tip">Oakland's Encampment Abatement Policy divides the city into high-sensitivity and low-sensitivity zones. In high-sensitivity zones — locations near critical infrastructure such as traffic lanes and schools — encampments are prioritized for closure. Encampments are not prioritized for closure in low-sensitivity zones as long as they adhere to a set of strict requirements.</div>
-              <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
-                <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Intervention Type <button class="ls-info-btn" onclick="toggleInfoTip('iv-tip')" aria-label="What are intervention types?">?</button></div>
-              <div class="ls-info-tip" id="iv-tip">There are five types of encampment interventions captured in this dataset: Full Closures, Health &amp; Hygiene interventions, Deep Cleanings, Partial Closures, and Emergency Closures. Since 2024, the City of Oakland has focused almost entirely on full closures.</div>
-              <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="iv-closure"  onclick="toggleIntervention('closure')">Closure</button>
-                <button class="ls-toggle-btn" id="iv-cleaning" onclick="toggleIntervention('cleaning')">Deep Cleaning</button>
-                <button class="ls-toggle-btn" id="iv-other"    onclick="toggleIntervention('other')">Other</button>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Operation Length</div>
-              <div class="ls-oplen-row">
-                <span class="ls-oplen-label">At least</span>
-                <input class="ls-oplen-input" type="number" id="op-length-min" min="1" placeholder="—" oninput="applyOpLengthFilter()" />
-                <span class="ls-oplen-label">days</span>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Postings per Operation</div>
-              <div class="ls-oplen-row">
-                <span class="ls-oplen-label">At least</span>
-                <input class="ls-oplen-input" type="number" id="op-postings-min" min="1" placeholder="—" oninput="applyOpPostingsFilter()" />
-                <span class="ls-oplen-label">postings</span>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Animate</div>
-              <div class="anim-date-display" id="anim-date-display">—</div>
-              <div class="ls-time-inputs anim-inputs">
-                <input class="ls-date-input" type="date" id="anim-date-from" />
-                <span class="ls-date-sep">–</span>
-                <input class="ls-date-input" type="date" id="anim-date-to" />
-              </div>
-              <div class="ls-toggle-row">
-                <button class="ls-toggle-btn" id="btn-anim-play"  onclick="toggleAnimation()">Play</button>
-              </div>
-            </div>
-
-            <div class="ls-filter-group">
-              <div class="ls-filter-label">Draw Zone</div>
-              <button class="ls-draw-btn" id="btn-draw-zone" onclick="toggleDrawZone()">Draw Zone</button>
-              <div id="zone-results" class="zone-results">
-                <div class="zone-stat-row"><span>Postings</span><span class="zone-stat-value" id="zone-postings">—</span></div>
-                <div class="zone-stat-row"><span>Operations</span><span class="zone-stat-value" id="zone-ops">—</span></div>
-                <div class="zone-stat-row zone-stat-sub"><span>Closures</span><span id="zone-closures">—</span></div>
-                <div class="zone-stat-row zone-stat-sub"><span>Deep Cleanings</span><span id="zone-cleanings">—</span></div>
-                <div class="zone-stat-row zone-stat-sub"><span>Other</span><span id="zone-other">—</span></div>
-                <button class="ls-draw-btn ls-draw-btn-clear" onclick="clearZone()">Clear Zone</button>
-              </div>
-            </div>
-
-            <button class="ls-reset-btn" onclick="resetFilters()">Reset Filters</button>
-
-          </div>
-        </div>
+        <button class="ls-nav-btn" id="btn-map-filters" onclick="toggleFiltersPanel()">Map Filters</button>
 
         <div class="ls-divider"></div>
 
@@ -226,6 +54,149 @@
       <button class="left-sidebar-toggle" onclick="toggleLeftSidebar()">
         <span class="left-toggle-arrow">◀</span>
       </button>
+    </div>
+
+    <!-- Filters Panel -->
+    <div id="filters-panel">
+      <button class="sidebar-close" onclick="toggleFiltersPanel()">✕</button>
+      <div class="fp-title">Map Filters</div>
+      <div class="fp-action-row">
+        <button class="fp-action-btn" onclick="openSeeAllPanel()">See Data</button>
+        <button class="fp-action-btn fp-reset-btn" id="btn-reset-filters" onclick="resetFilters()">Reset Filters</button>
+      </div>
+      <div class="left-sidebar-inner">
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Find a Location</div>
+          <mapbox-search-box id="search-box"></mapbox-search-box>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Time Range</div>
+          <div class="ls-time-inputs">
+            <input class="ls-date-input" type="date" id="ls-date-from" oninput="applyDateFilter()" />
+            <span class="ls-date-sep">–</span>
+            <input class="ls-date-input" type="date" id="ls-date-to" oninput="applyDateFilter()" />
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Grants Pass v. Johnson <button class="ls-info-btn" onclick="toggleInfoTip('gp-tip')" aria-label="What is Grants Pass?">?</button></div>
+          <div class="ls-info-tip" id="gp-tip">The Supreme Court's <em>City of Grants Pass v. Johnson</em> (2024) ruling allowed state and local governments to cite or arrest unhoused people for living in public without first offering them shelter. After the ruling was announced, Governor Gavin Newsom urged California officials to push forward with encampment closures, ushering in a wave of new anti-camping policies across the state.</div>
+          <div class="ls-toggle-row">
+            <button class="ls-toggle-btn" id="gp-before" onclick="setFilter('before')">Before</button>
+            <button class="ls-toggle-btn" id="gp-after"  onclick="setFilter('after')">After</button>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <button class="ls-mayor-header" onclick="toggleMayorsPanel()">
+            Mayoral Terms <span class="ls-chevron" id="mayors-chevron">▼</span>
+          </button>
+          <div class="ls-section-body closed" id="mayors-body">
+            <table class="ls-mayor-table">
+              <thead>
+                <tr><th></th><th>Mayor</th><th>Term Start</th><th>Term End</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><input type="checkbox" id="mayor-schaaf" checked onchange="applyMayorFilter()" /></td><td>Schaaf</td><td>Jan 2015</td><td>Jan 2023</td></tr>
+                <tr><td><input type="checkbox" id="mayor-thao" checked onchange="applyMayorFilter()" /></td><td>Thao</td><td>Jan 2023</td><td>Dec 2024</td></tr>
+                <tr><td><input type="checkbox" id="mayor-bas" checked onchange="applyMayorFilter()" /></td><td>Fortunato Bas</td><td>Dec 2024</td><td>Jan 2025</td></tr>
+                <tr><td><input type="checkbox" id="mayor-jenkins" checked onchange="applyMayorFilter()" /></td><td>Jenkins</td><td>Jan 2025</td><td>May 2025</td></tr>
+                <tr><td><input type="checkbox" id="mayor-lee" checked onchange="applyMayorFilter()" /></td><td>Lee</td><td>May 2025</td><td>Present</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <button class="ls-mayor-header" onclick="toggleDistrictsPanel()">
+            Council Districts <span class="ls-chevron" id="districts-chevron">▼</span>
+          </button>
+          <div class="ls-section-body closed" id="districts-body">
+            <table class="ls-mayor-table">
+              <thead>
+                <tr><th></th><th>District</th><th>Postings</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><input type="checkbox" id="district-1" onchange="applyDistrictFilter()" /></td><td>District 1</td><td id="district-count-1">—</td></tr>
+                <tr><td><input type="checkbox" id="district-2" onchange="applyDistrictFilter()" /></td><td>District 2</td><td id="district-count-2">—</td></tr>
+                <tr><td><input type="checkbox" id="district-3" onchange="applyDistrictFilter()" /></td><td>District 3</td><td id="district-count-3">—</td></tr>
+                <tr><td><input type="checkbox" id="district-4" onchange="applyDistrictFilter()" /></td><td>District 4</td><td id="district-count-4">—</td></tr>
+                <tr><td><input type="checkbox" id="district-5" onchange="applyDistrictFilter()" /></td><td>District 5</td><td id="district-count-5">—</td></tr>
+                <tr><td><input type="checkbox" id="district-6" onchange="applyDistrictFilter()" /></td><td>District 6</td><td id="district-count-6">—</td></tr>
+                <tr><td><input type="checkbox" id="district-7" onchange="applyDistrictFilter()" /></td><td>District 7</td><td id="district-count-7">—</td></tr>
+              </tbody>
+            </table>
+            <p class="ls-filter-note">Oakland redrew its council districts in 2022. This leads to some instances where a posting falls outside of current district boundaries.</p>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Sensitivity Zone <button class="ls-info-btn" onclick="toggleInfoTip('sz-tip')" aria-label="What is a sensitivity zone?">?</button></div>
+          <div class="ls-info-tip" id="sz-tip">Oakland's Encampment Abatement Policy divides the city into high-sensitivity and low-sensitivity zones. In high-sensitivity zones — locations near critical infrastructure such as traffic lanes and schools — encampments are prioritized for closure. Encampments are not prioritized for closure in low-sensitivity zones as long as they adhere to a set of strict requirements.</div>
+          <div class="ls-toggle-row">
+            <button class="ls-toggle-btn" id="sz-high" onclick="toggleSensitivityZone('High')">High</button>
+            <button class="ls-toggle-btn" id="sz-low"  onclick="toggleSensitivityZone('Low')">Low</button>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Intervention Type <button class="ls-info-btn" onclick="toggleInfoTip('iv-tip')" aria-label="What are intervention types?">?</button></div>
+          <div class="ls-info-tip" id="iv-tip">There are five types of encampment interventions captured in this dataset: Full Closures, Health &amp; Hygiene interventions, Deep Cleanings, Partial Closures, and Emergency Closures. Since 2024, the City of Oakland has focused almost entirely on full closures.</div>
+          <div class="ls-toggle-row">
+            <button class="ls-toggle-btn" id="iv-closure"  onclick="toggleIntervention('closure')">Closure</button>
+            <button class="ls-toggle-btn" id="iv-cleaning" onclick="toggleIntervention('cleaning')">Deep Cleaning</button>
+            <button class="ls-toggle-btn" id="iv-other"    onclick="toggleIntervention('other')">Other</button>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Operation Length</div>
+          <div class="ls-oplen-row">
+            <span class="ls-oplen-label">At least</span>
+            <input class="ls-oplen-input" type="number" id="op-length-min" min="1" placeholder="—" oninput="applyOpLengthFilter()" />
+            <span class="ls-oplen-label">days</span>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Postings per Operation</div>
+          <div class="ls-oplen-row">
+            <span class="ls-oplen-label">At least</span>
+            <input class="ls-oplen-input" type="number" id="op-postings-min" min="1" placeholder="—" oninput="applyOpPostingsFilter()" />
+            <span class="ls-oplen-label">postings</span>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Animate</div>
+          <div class="anim-date-display" id="anim-date-display">—</div>
+          <div class="ls-time-inputs anim-inputs">
+            <input class="ls-date-input" type="date" id="anim-date-from" />
+            <span class="ls-date-sep">–</span>
+            <input class="ls-date-input" type="date" id="anim-date-to" />
+          </div>
+          <div class="ls-toggle-row">
+            <button class="ls-toggle-btn" id="btn-anim-play" onclick="toggleAnimation()">Play</button>
+          </div>
+        </div>
+
+        <div class="ls-filter-group">
+          <div class="ls-filter-label">Draw Zone</div>
+          <button class="ls-draw-btn" id="btn-draw-zone" onclick="toggleDrawZone()">Draw Zone</button>
+          <div id="zone-results" class="zone-results">
+            <div class="zone-stat-row"><span>Postings</span><span class="zone-stat-value" id="zone-postings">—</span></div>
+            <div class="zone-stat-row"><span>Operations</span><span class="zone-stat-value" id="zone-ops">—</span></div>
+            <div class="zone-stat-row zone-stat-sub"><span>Closures</span><span id="zone-closures">—</span></div>
+            <div class="zone-stat-row zone-stat-sub"><span>Deep Cleanings</span><span id="zone-cleanings">—</span></div>
+            <div class="zone-stat-row zone-stat-sub"><span>Other</span><span id="zone-other">—</span></div>
+            <button class="ls-draw-btn ls-draw-btn-clear" onclick="clearZone()">Clear Zone</button>
+          </div>
+        </div>
+
+
+      </div>
     </div>
 
     <!-- Sidebar -->
@@ -321,7 +292,6 @@
           </div>
         </div>
       </div>
-      <button class="see-data-map-btn" onclick="openSeeAllPanel()">See Data</button>
     </div>
   </div>
 
@@ -331,17 +301,7 @@
     <div class="content-panel-inner" id="content-panel-body"></div>
   </div>
 
-  <!-- Intro overlay -->
-  <div id="intro-overlay">
-    <div class="intro-box">
-      <div class="intro-title">Oakland Encampment Closures</div>
-      <div class="intro-sub">A project of Swept Off the Map</div>
-      <div class="intro-byline">Cole Haddock and Maria Toldi for Street Spirit News</div>
-      <button class="intro-btn" onclick="document.getElementById('intro-overlay').classList.add('hidden')">Enter the Map</button>
-    </div>
-  </div>
-
-  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="map.js"></script>
 </body>

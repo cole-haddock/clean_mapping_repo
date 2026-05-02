@@ -21,6 +21,7 @@
   --font-mono:    'Libre Bodoni', 'Courier New', serif;
   --font-sans:    'Libre Bodoni', 'Helvetica Neue', serif;
   --sidebar-w:     500px;
+  --left-nav-w:    280px;
   --left-sidebar-w: 510px;
   --header-h:      100px;
 }
@@ -724,7 +725,7 @@ tbody td.td-oplen-long {
   position: absolute;
   top: 0;
   left: 0;
-  width: var(--left-sidebar-w);
+  width: var(--left-nav-w);
   height: 100%;
   background: var(--panel-bg);
   border-right: 1px solid var(--panel-border);
@@ -740,11 +741,87 @@ tbody td.td-oplen-long {
   transform: translateX(0);
 }
 
+#filters-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--left-sidebar-w);
+  height: 100%;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--panel-border);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 6;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.06);
+  overflow: hidden;
+}
+
+#filters-panel.open {
+  transform: translateX(0);
+}
+
+.fp-action-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--panel-border);
+  flex-shrink: 0;
+}
+
+.fp-action-btn {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent-red);
+  border: none;
+  padding: 8px 0;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.fp-action-btn:hover { background: #8a0000; }
+
+.fp-reset-btn {
+  background: #fff;
+  color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+}
+
+.fp-reset-btn.active {
+  background: var(--accent-red);
+  color: #fff;
+}
+
+.fp-reset-btn:hover { background: #f5e5e5; }
+.fp-reset-btn.active:hover { background: #8a0000; }
+
+.fp-title {
+  font-family: 'Futura', sans-serif;
+  font-size: 23px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  padding: 20px 20px 10px;
+  flex-shrink: 0;
+}
+
+
 .left-sidebar-inner {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   padding: 20px 16px 12px;
+}
+
+#left-sidebar .left-sidebar-inner {
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .left-sidebar-footer {
@@ -766,7 +843,8 @@ tbody td.td-oplen-long {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-primary);
-  padding: 10px 4px 10px 20px;
+  padding: 10px 20px;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -1122,6 +1200,10 @@ a.ls-nav-btn { text-decoration: none; }
 }
 
 .map-wrap:has(#left-sidebar.open) .legend-stack {
+  left: calc(var(--left-nav-w) + 40px);
+}
+
+.map-wrap:has(#filters-panel.open) .legend-stack {
   left: calc(var(--left-sidebar-w) + 40px);
 }
 
@@ -1219,77 +1301,6 @@ a.ls-nav-btn { text-decoration: none; }
   flex-shrink: 0;
   border-radius: 2px;
   opacity: 0.6;
-}
-
-/* ── Intro Overlay ──────────────────────────────────────────────────────── */
-#intro-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--panel-bg);
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.4s ease;
-}
-
-#intro-overlay.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.intro-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  text-align: center;
-  padding: 40px;
-}
-
-.intro-title {
-  font-family: 'Futura', sans-serif;
-  font-size: clamp(24px, 4vw, 48px);
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-primary);
-}
-
-.intro-sub {
-  font-family: var(--font-mono);
-  font-size: clamp(13px, 1.5vw, 18px);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.intro-byline {
-  font-family: var(--font-mono);
-  font-size: clamp(11px, 1.2vw, 15px);
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
-  font-style: italic;
-}
-
-.intro-btn {
-  margin-top: 16px;
-  font-family: 'Futura', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--accent-red);
-  border: none;
-  padding: 14px 36px;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: background 0.15s;
-}
-
-.intro-btn:hover {
-  background: #8a0000;
 }
 
 /* ── Mapbox Search Box ──────────────────────────────────────────────────── */
