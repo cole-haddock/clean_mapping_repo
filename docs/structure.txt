@@ -6,32 +6,55 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojso
 
+5 - 1 - 26
 
-4 - 30 - 26
+- Fix it so that if you pause the animation and then click anything else they don't stay highlighted
+- Dum down the animation so that there's only three buttons - the date range and then play
+- The map is blank at the beginning of every time range animation (doesn't call the past dots)
+- If time: make mobile better
+- delete the claude folder
+- make the filters look better
+- center the text of the left
+- send elli a new version of the header map
+- fix the padding on the left of the map
+- make the header page look nicer
+- Find a way to only have the filtered rows on the right sidebar, add button that says "Only Filtered Rows Showing, Display All Rows"
+- Add filters for operation length
+- Add filter for number of posting per single operation
+- Add mesros credit to the map website
+- make the github repo nice
 
-- fix all the filters so that they update the count and the see data button automatically
-- add an export data button 
-- move the see data button to replace the oral histories
-- Intervention type buttons to correspond to the colors 
-- move the see data button
-- get rid of the header page
-- add mesro's logo to the about us
-= add street spirit logo
-- add the about us page to mirror the website
+4 - 30 - 26 
+
+- DONE - fix all the filters so that they update the count and the see data button automatically DONE
+- DONE - add an export data button  DONE
+- DONE - move the see data button to replace the oral histories DONE
+- DONE - Intervention type buttons to correspond to the colors 
+- DONE - move the see data button DONE
+- DONE - get rid of the header page
+- DONE -add mesro's logo to the about us
+= DONE -add street spirit logo
+- DONE - add the about us page to mirror the website
 - try out a different logo for the title
-- dots off button
-- update the grants pass text and the rest of them 
-- Add a note to council districts: oakland redrew its council districts in 2022. This leads 
+- DONE - dots off button
+- DONE - update the grants pass text and the rest of them 
+- DONE - Add a note to council districts: oakland redrew its council districts in 2022. This leads 
 to some instances where a posting falls outside of current district boundaries. 
-- Fix the scrolling when they are all expanded
+- DONE - Fix the scrolling when they are all expanded
 - Fix it so that if you pause the animation and then click anything else they don't stay highlighted
 - Dum down the animation so that there's only three buttons 
 - The map is blank at the beginning of every time range (doesn't call the past dots)
-- restrict search bar to only search oakland locations
-- restrict calendar to only dates within the dataset
+- DONE - restrict search bar to only search oakland locations
+- DONE - restrict calendar to only dates within the dataset
 - Draw zone - when clicked, it should say draw polygon then press enter
-- See postings on the right instead of Dots on or off
+- DONE - See postings on the right instead of Dots on or off DONE
 - If time: make mobile better
+- delete the claude folder
+- DONE - fix the title font
+- make the filters look better
+- center the text of the left
+- DONE - fix the button in the center
+- send elli a new version of the header map
 
 
 

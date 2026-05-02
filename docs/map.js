@@ -1146,16 +1146,21 @@ function applyAnimationFilter() {
   dateTo = null;
   const base = buildDotFilter();
   dateTo = savedDateTo;
-  const upper = ['<=', ['slice', ['get', 'operation_start_date'], 0, 10], animationCurrentDate];
-  map.setFilter('dots-layer', base ? ['all', base, upper] : upper);
+  const { from } = getAnimBounds();
+  const window = ['all',
+    ['>=', ['slice', ['get', 'operation_start_date'], 0, 10], from],
+    ['<=', ['slice', ['get', 'operation_start_date'], 0, 10], animationCurrentDate],
+  ];
+  map.setFilter('dots-layer', base ? ['all', base, window] : window);
 }
 
 function applyAnimLineFilter() {
   const savedDateTo = dateTo;
+  const { from } = getAnimBounds();
   dateTo = null;
   const visibleDots = applyJsFilter(allDotFeatures).filter(f => {
     const d = (f.properties.operation_start_date || '').slice(0, 10);
-    return d && d <= animationCurrentDate;
+    return d && d >= from && d <= animationCurrentDate;
   });
   dateTo = savedDateTo;
 
@@ -1185,11 +1190,15 @@ function toggleAnimation() {
 
 function playAnimation() {
   const { from, to } = getAnimBounds();
+  const steps = buildMonthlySteps(from, to);
 
-  if (!animationCurrentDate || animationCurrentDate >= to) animationCurrentDate = from;
+  // On fresh start use step 0; on resume find the step we're closest to
+  let stepIndex = animationCurrentDate && animationCurrentDate < to
+    ? steps.findIndex(s => s >= animationCurrentDate)
+    : 0;
+  if (stepIndex < 0) stepIndex = 0;
 
-  const steps = buildMonthlySteps(animationCurrentDate, to);
-  let stepIndex = 0;
+  animationCurrentDate = steps[stepIndex];
 
   animating = true;
   document.getElementById('btn-anim-play').textContent = 'Pause';
