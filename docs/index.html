@@ -169,6 +169,24 @@
             </div>
 
             <div class="ls-filter-group">
+              <div class="ls-filter-label">Operation Length</div>
+              <div class="ls-oplen-row">
+                <span class="ls-oplen-label">At least</span>
+                <input class="ls-oplen-input" type="number" id="op-length-min" min="1" placeholder="—" oninput="applyOpLengthFilter()" />
+                <span class="ls-oplen-label">days</span>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
+              <div class="ls-filter-label">Postings per Operation</div>
+              <div class="ls-oplen-row">
+                <span class="ls-oplen-label">At least</span>
+                <input class="ls-oplen-input" type="number" id="op-postings-min" min="1" placeholder="—" oninput="applyOpPostingsFilter()" />
+                <span class="ls-oplen-label">postings</span>
+              </div>
+            </div>
+
+            <div class="ls-filter-group">
               <div class="ls-filter-label">Animate</div>
               <div class="anim-date-display" id="anim-date-display">—</div>
               <div class="ls-time-inputs anim-inputs">
@@ -233,6 +251,7 @@
 
       <div class="sb-focus-wrap">
         <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">See Posting Dots</button>
+        <button id="btn-sidebar-filter" class="focus-toggle-btn active" onclick="toggleSidebarFilter()">Only Filtered Rows Showing — Show All</button>
       </div>
 
       <div class="table-wrap">

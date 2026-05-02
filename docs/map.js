@@ -39,6 +39,10 @@ let draw                  = null;
 let animating             = false;
 let animationInterval     = null;
 let animationCurrentDate  = null;
+let minOpLength           = null;   // minimum operation duration in days, or null
+let minOpPostings         = null;   // minimum postings per operation, or null
+let sidebarShowFiltered   = true;   // when true, right sidebar only shows rows matching current filters
+let allSweepStats         = {};     // sweepId → { min, max, days } computed at load
 
 // ── Geometry-type filter constants ────────────────────────────────────────
 const IS_LINE = ['==', ['geometry-type'], 'LineString'];
@@ -141,6 +145,23 @@ map.on('load', async () => {
 
   // Stash original features for filter count
   allDotFeatures = dotsGJ.features;
+
+  // Build global sweep stats (duration etc.) used by op-length filter
+  allDotFeatures.forEach(f => {
+    const p = f.properties;
+    const sid = p.sweep_event_id;
+    if (!sid) return;
+    if (!allSweepStats[sid]) allSweepStats[sid] = { min: null, max: null, days: 1, postings: 0 };
+    allSweepStats[sid].postings++;
+    const s = new Date(p.operation_start_date);
+    const e = new Date(p.operation_end_date);
+    if (!allSweepStats[sid].min || s < allSweepStats[sid].min) allSweepStats[sid].min = s;
+    if (!allSweepStats[sid].max || e > allSweepStats[sid].max) allSweepStats[sid].max = e;
+  });
+  Object.values(allSweepStats).forEach(s => {
+    if (s.min && s.max) s.days = Math.round((s.max - s.min) / 86400000) + 1;
+  });
+
   updateCounts(allDotFeatures);
   updateDistrictCounts();
   initAnimationDateInputs();
@@ -584,11 +605,21 @@ function resetDotPositions() {
 
 // ── Build sidebar table ───────────────────────────────────────────────────
 function buildSidebar(locId, activePostId, clickedProps) {
-  // Pull all dots for this location from the source
-  const source   = map.getSource('dots');
-  const features = source._data.features.filter(
+  // Pull dots for this location, optionally filtered to match active filters
+  const source      = map.getSource('dots');
+  const allLocFeats = source._data.features.filter(
     f => f.properties.unique_location_id === locId
   );
+  const features = sidebarShowFiltered ? applyJsFilter(allLocFeats) : allLocFeats;
+
+  // Update the filter-toggle button
+  const filterBtn = document.getElementById('btn-sidebar-filter');
+  if (filterBtn) {
+    filterBtn.textContent = sidebarShowFiltered
+      ? 'Only Filtered Rows Showing — Show All'
+      : 'Showing All Rows — Show Filtered Only';
+    filterBtn.classList.toggle('active', sidebarShowFiltered);
+  }
 
   // Sort by date ascending
   features.sort((a, b) =>
@@ -919,6 +950,20 @@ function buildDotFilter() {
     parts.push(['within', activeZonePolygon.geometry]);
   }
 
+  if (minOpLength !== null) {
+    const matchingSweeps = Object.entries(allSweepStats)
+      .filter(([, s]) => s.days >= minOpLength)
+      .map(([sid]) => sid);
+    parts.push(['in', ['get', 'sweep_event_id'], ['literal', matchingSweeps]]);
+  }
+
+  if (minOpPostings !== null) {
+    const matchingSweeps = Object.entries(allSweepStats)
+      .filter(([, s]) => s.postings >= minOpPostings)
+      .map(([sid]) => sid);
+    parts.push(['in', ['get', 'sweep_event_id'], ['literal', matchingSweeps]]);
+  }
+
   return parts.length === 0 ? null : parts.length === 1 ? parts[0] : ['all', ...parts];
 }
 
@@ -958,6 +1003,14 @@ function applyJsFilter(features) {
     }
     if (activeZonePolygon) {
       if (!turf.booleanPointInPolygon(f, activeZonePolygon)) return false;
+    }
+    if (minOpLength !== null) {
+      const dur = allSweepStats[p.sweep_event_id];
+      if (!dur || dur.days < minOpLength) return false;
+    }
+    if (minOpPostings !== null) {
+      const dur = allSweepStats[p.sweep_event_id];
+      if (!dur || dur.postings < minOpPostings) return false;
     }
     return true;
   });
@@ -1040,6 +1093,32 @@ function setFilter(type) {
   document.dispatchEvent(new Event('filtersChanged'));
 }
 
+// ── Operation length filter ───────────────────────────────────────────────
+function toggleSidebarFilter() {
+  sidebarShowFiltered = !sidebarShowFiltered;
+  if (selectedLocationId !== null && selectedPostingId !== null) {
+    const feat = map.getSource('dots')._data.features
+      .find(f => f.properties.posting_id === selectedPostingId);
+    if (feat) buildSidebar(selectedLocationId, selectedPostingId, feat.properties);
+  }
+}
+
+function applyOpLengthFilter() {
+  const val = parseInt(document.getElementById('op-length-min').value);
+  minOpLength = isNaN(val) || val < 1 ? null : val;
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
+}
+
+function applyOpPostingsFilter() {
+  const val = parseInt(document.getElementById('op-postings-min').value);
+  minOpPostings = isNaN(val) || val < 1 ? null : val;
+  map.setFilter('dots-layer', buildDotFilter());
+  updateCounts(applyJsFilter(allDotFeatures));
+  document.dispatchEvent(new Event('filtersChanged'));
+}
+
 // ── Date range filter ─────────────────────────────────────────────────────
 function applyDateFilter() {
   dateFrom = document.getElementById('ls-date-from').value || null;
@@ -1054,6 +1133,12 @@ function resetFilters() {
   clearZone();
   finishAnimation();
   restoreLineFilter();
+  minOpLength = null;
+  const opLenEl = document.getElementById('op-length-min');
+  if (opLenEl) opLenEl.value = '';
+  minOpPostings = null;
+  const opPostEl = document.getElementById('op-postings-min');
+  if (opPostEl) opPostEl.value = '';
   dateFrom = null;
   dateTo   = null;
   const fromEl = document.getElementById('ls-date-from');

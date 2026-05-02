@@ -535,6 +535,10 @@ header {
   padding: 4px 10px;
 }
 
+.sb-focus-wrap .focus-toggle-btn + .focus-toggle-btn {
+  margin-top: 5px;
+}
+
 /* ── Table ──────────────────────────────────────────────────────────────── */
 .table-wrap {
   flex: 1;
@@ -916,6 +920,36 @@ a.ls-nav-btn { text-decoration: none; }
   font-family: var(--font-mono);
   font-size: 17px;
   color: var(--text-muted);
+}
+
+.ls-oplen-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ls-oplen-label {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.ls-oplen-input {
+  width: 64px;
+  font-family: var(--font-mono);
+  font-size: 17px;
+  color: var(--text-primary);
+  background: var(--bg);
+  border: 1px solid var(--panel-border);
+  padding: 6px 8px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.ls-oplen-input::-webkit-inner-spin-button,
+.ls-oplen-input::-webkit-outer-spin-button {
+  opacity: 1;
 }
 
 /* GP toggle */
