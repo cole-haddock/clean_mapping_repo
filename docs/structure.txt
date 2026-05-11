@@ -6,23 +6,37 @@ clean_mapping_repo/
     ├── posting_dots_4_2.geojson
     └── combined_sweeps.geojso
 
+5 - 3 - 25
+
+- Update the Introduction
+- Update the About us
+- Update the methodologies
+- Fix the map filters page
+- Make the GitHub repo nice
+
+
+
 5 - 1 - 26
 
-- Fix it so that if you pause the animation and then click anything else they don't stay highlighted
-- Dum down the animation so that there's only three buttons - the date range and then play
-- The map is blank at the beginning of every time range animation (doesn't call the past dots)
+- DONE - Fix it so that if you pause the animation and then click anything else they don't stay highlighted
+- DONE - Dum down the animation so that there's only three buttons - the date range and then play
+- DONE - The map is blank at the beginning of every time range animation (doesn't call the past dots)
 - If time: make mobile better
 - delete the claude folder
-- make the filters look better
-- center the text of the left
+- DONE - make the filters look better
+- DONE - center the text of the left
 - send elli a new version of the header map
-- fix the padding on the left of the map
-- make the header page look nicer
-- Find a way to only have the filtered rows on the right sidebar, add button that says "Only Filtered Rows Showing, Display All Rows"
-- Add filters for operation length
-- Add filter for number of posting per single operation
+- DONE - fix the padding on the left of the map
+- DONE - delete  the header page 
+- DONE - Find a way to only have the filtered rows on the right sidebar, add button that says "Only Filtered Rows Showing, Display All Rows"
+- DONE - Add filters for operation length
+- DONE - Add filter for number of posting per single operation
 - Add mesros credit to the map website
 - make the github repo nice
+- make the button for the map filter header into one not two 
+- Add the intro and methodologies 
+- make the methodologies and the intro and the analysis pop up in the middle like articles
+- DONE - maria says make the filters their own pop up
 
 4 - 30 - 26 
 

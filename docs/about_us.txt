@@ -1,16 +1,47 @@
+
+
+About the project:
+Swept Off the Map is a seven-month investigation into the scope and scale of 
+encampment sweeps in Berkeley, Richmond and Oakland. This map is one 
+of five published pieces that comprise this investigation. The other 
+pieces include: 
+
+
+- Title: Governing Homelessness: Encampment Managemetn in 
+Richmond, Berkeley, and Oakland
+Subtitle: How three East Bay cities manage unsheltered homelessness, 
+outlining local policies, laws, and practices, and how they play out
+on the ground. 
+
+- Title: No Place to Park
+Subtitle: How the search for stability can make it difficult for vehicle dwellers 
+to move forward
+
+Title: Losing Patients
+Subtitle: LifeLong Street Medicine doctors explain the health consequences
+of encampment closures on their Patients
+
+Title: 8th and Harrison Stays
+Subtitle: A long-standing encampment community in West Berkeley lives under the 
+constant threat of permanent closure
+    
+
+
+
+
 About the authors:
 
 Cole Haddock and Maria Toldi are journalists and researchers whose collaborative work centers on homelessness, displacement, and community resilience in the Bay Area. Their partnership began in 2023 producing the documentary Unhoused and Unseen for San Quentin News, and has continued through ongoing collaborations with Street Spirit. Over the past three years, their work has centered on dignifying and respectful journalism, mutual aid, and collaborative storytelling.
 
-Cole Haddock is a graduate of the Geography Department of the University of California, Berkeley and the Human Rights Center at UC Berkeley Law. He will work this summer as a daily news reporter for the Daily Sitka Sentinel in Alaska. 
-
 Maria Toldi graduated from University of California, Berkeley in 2025, where she earned her degree in Interdisciplinary Research Studies with a minor in Political Economy. Her academic work has integrated sociology, public policy, ethnic studies, and psychology to critically examine structural inequality and systems of social control. 
 
-The Judith Lee Stronach Prize:
+Cole Haddock is a graduate of the Geography Department of the University of California, Berkeley and the Human Rights Center at UC Berkeley Law. He will work this summer as a daily news reporter for the Daily Sitka Sentinel in Alaska. 
+
+The Judith Lee Stronach Prize
 
 This project was fully funded by UC Berkeley’s Judith Lee Stronach Baccalaureate Prize, which supports intellectual and creative pursuits that heighten awareness of issues of social consciousness and contribute to the public good. 
 
-Advisors:
+Advisors
 
 Alastair Boone 
 Director of Street Spirit newspaper and KALW Beat Reporter
@@ -18,13 +49,16 @@ Alastair led the editorial oversight for Swept Off The Map. She provided project
 
 Dr. Desiree Fields
 UC Berkeley Geography Department Chair and Associate Professor 
-Dr. Fields offered editorial support and guidance on research methods.
+Dr. Fields contributed editorial support and expert guidance on research methods and project management at every stage of the project.
 
 Georgia von Minden
 Adjunct Professor at University of San Francisco 
 Georgia provided computer science guidance for Swept Off The Map. She taught proper data and code organization standards, as well as assisted with fact-checking. 
 
 Community Partners:
+
+Our community partners helped us become embedded in the Bay Area cities of Richmond, Berkeley, Oakland. This aided our education about the policies and practices that shape the region’s response to homelessness. 
+
 
 SOS Richmond
 
@@ -34,23 +68,36 @@ Episcopal Church of the Good Shepherd
 
 The Episcopal Church of the Good Shepherd is a historic congregation in West Berkeley, with a long and deeply rooted commitment to serving its surrounding community from hosting an early Black Panthers' breakfast program for schoolchildren to developing a prototype of the Head Start Program. Today, the church has an active food pantry and weekly food program. Since fall 2024, Cole and Maria have partnered with Good Shepherd for their food program, delivering 120 lunches weekly (more than 9,000 in total) to day laborers and encampment residents in the East Bay.
 
+Art and Design
+
+Website development and design
+Elli Matejka
+
+Logo design
+Mesro Coles-El 
+
 
 Special thanks to:
 
-Yesica Prado of El Tecolote
-Paul Kealoha-Blake of Consider the Homeless
-Kelsey Hubbard of Love and Justice in the Streets
-Brigitte Nicoletti of East Bay Community Law
-Osha Neumann of East Bay Community Law
-Jessica Lin-Tupas of U.C. Berkeley
 
-U.C. Berkeley Human Rights Center
-Free Meals on Wheels
-Good Karma Water
-Rose Damasc Cafe
-Happy Donuts
+Wali Henderson — San Quentin News
 
+Yesica Prado — El Tecolote
 
+Paul Kealoha-Blake — Consider the Homeless
 
+Kelsey Hubbard — Oakland Revealed
+
+Brigitte Nicoletti — East Bay Community Law
+
+Osha Neumann — East Bay Community Law
+
+Jessica Lin-Tupas — U.C. Berkeley
+
+Dr. Alexa Koenig — Human Rights Center
+
+Japjot Sethi — Free Meals on Wheels and Good Karma Water
+
+Bradley Penner — Street Spirit 
 
 

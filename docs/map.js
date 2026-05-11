@@ -1532,7 +1532,16 @@ function openAboutUsPanel() {
   body.innerHTML = `
     <img src="data/mesro_logo.png" class="au-logo" alt="MESRO" />
     <div class="cp-title">About the Project</div>
-    <p class="cp-p"><em>Swept Off the Map</em> is a seven-month investigation into the scope and scale of encampment sweeps in Berkeley, Richmond and Oakland. This map is one of five published pieces that comprise this investigation. The other pieces include: a guide to homeless management in all three cities, a community profile of an encampment in Berkeley at risk of getting swept out, a piece about how sweeps affect LifeLong Street Medicine, and a profile of RV residents in Richmond at risk of getting towed. All pieces are published with Street Spirit.</p>
+    <p class="cp-p"><em>Swept Off the Map</em> is a seven-month investigation into the scope and scale of encampment sweeps in Berkeley, Richmond and Oakland. This map is one of five published pieces that comprise this investigation. The other pieces include:</p>
+    <div class="au-advisor-name">Governing Homelessness: Encampment Management in Richmond, Berkeley, and Oakland</div>
+    <div class="au-advisor-role">How three East Bay cities manage unsheltered homelessness, outlining local policies, laws, and practices, and how they play out on the ground.</div>
+    <div class="au-advisor-name">No Place to Park</div>
+    <div class="au-advisor-role">How the search for stability can make it difficult for vehicle dwellers to move forward.</div>
+    <div class="au-advisor-name">Losing Patients</div>
+    <div class="au-advisor-role">LifeLong Street Medicine doctors explain the health consequences of encampment closures on their patients.</div>
+    <div class="au-advisor-name">8th and Harrison Stays</div>
+    <div class="au-advisor-role">A long-standing encampment community in West Berkeley lives under the constant threat of permanent closure.</div>
+
     <a class="cp-submit-btn" href="#" target="_blank" rel="noopener">Project Website</a>
 
     <div class="cp-section-header">About the Authors</div>
@@ -1548,8 +1557,8 @@ function openAboutUsPanel() {
     <div class="au-advisor-role">Director of Street Spirit newspaper and KALW Beat Reporter</div>
     <p class="cp-p">Alastair led the editorial oversight for Swept Off the Map. She provided project management, edited individual stories, provided a framework for ethical reporting and fact-checking, and offered subject matter expertise.</p>
     <div class="au-advisor-name">Dr. Desiree Fields</div>
-    <div class="au-advisor-role">UC Berkeley Geography Department Chair</div>
-    <p class="cp-p">Dr. Fields offered editorial support and guidance on research methods.</p>
+    <div class="au-advisor-role">UC Berkeley Geography Department Chair and Associate Professor</div>
+    <p class="cp-p">Dr. Fields contributed editorial support and expert guidance on research methods and project management at every stage of the project.</p>
     <div class="au-advisor-name">Georgia von Minden</div>
     <div class="au-advisor-role">Adjunct Professor at University of San Francisco</div>
     <p class="cp-p">Georgia provided computer science guidance for Swept Off the Map. She taught proper data and code organization standards, as well as assisted with fact-checking.</p>
@@ -1557,6 +1566,10 @@ function openAboutUsPanel() {
     <div class="cp-section-header">Community Partners</div>
     <p class="cp-p"><span class="au-inline-name">SOS Richmond</span> is a community-rooted nonprofit serving Richmond, CA, where unhoused and housed community members collaborate to address homelessness. They operate a wellness center and resource center to offer job support, food and clothing access, laundry services, and direct connections to essential county services. SOS Richmond also delivers hands-on encampment services, including mobile showers, trash pickup, portable toilets, and other supplies. Cole and Maria brought breakfast to the SOS Richmond warehouse nearly every week during their wellness center hours and talked about the Street Spirit newspaper with potential authors, vendors, and readers.</p>
     <p class="cp-p"><span class="au-inline-name">Episcopal Church of the Good Shepherd</span> is a historic congregation in West Berkeley, with a long and deeply rooted commitment to serving its surrounding community — from hosting an early Black Panthers' breakfast program for schoolchildren to developing a prototype of the Head Start Program. Today, the church has an active food pantry and weekly food program. Since fall 2024, Cole and Maria have partnered with Good Shepherd for their food program, delivering 120 lunches weekly (more than 9,000 in total) to day laborers and encampment residents in the East Bay.</p>
+
+    <div class="cp-section-header">Art and Design</div>
+    <p class="au-thanks-item"><span class="au-inline-name">Elli Matejka</span> — Website development and design</p>
+    <p class="au-thanks-item"><span class="au-inline-name">Mesro Coles-El</span> — Logo design</p>
 
     <div class="cp-section-header">Special Thanks</div>
     <p class="au-thanks-item"><span class="au-inline-name">Wali Henderson</span> — <em>San Quentin News</em></p>
@@ -1568,7 +1581,128 @@ function openAboutUsPanel() {
     <p class="au-thanks-item"><span class="au-inline-name">Jessica Lin-Tupas</span> — <em>U.C. Berkeley</em></p>
     <p class="au-thanks-item"><span class="au-inline-name">Dr. Alexa Koenig</span> — <em>Human Rights Center</em></p>
     <p class="au-thanks-item"><span class="au-inline-name">Japjot Sethi</span> — <em>Free Meals on Wheels</em> and <em>Good Karma Water</em></p>
+    <p class="au-thanks-item"><span class="au-inline-name">Bradley Penner</span> — <em>Street Spirit</em></p>
   `;
+  panel.classList.add('open');
+}
+
+function openIntroPanel() {
+  closeFiltersForContentPanel();
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  panel.classList.add('modal-panel');
+  body.innerHTML = `
+    <div class="cp-title">Introduction</div>
+
+    <div style="border: 2px solid var(--accent-red); background: rgba(172,0,0,0.06); padding: 16px 20px; margin-bottom: 20px;">
+      <p class="cp-p" style="font-weight: bold; margin-bottom: 0;">This is not a map of homeless encampments. This map documents four years of the City of Oakland's attempts to close and clean encampments on city property.</p>
+    </div>
+
+    <p class="cp-p">Five days a week, a team of police officers, officials, outreach staff, and public works employees traverse the City of Oakland to perform the work of "managing" encampments: Picking up garbage, hauling away tents, breaking down self-built structures, towing vehicles, and at times, making shelter offers. When their work is done, the ground is power-washed and encampment residents are forced to find somewhere else to stay. Residents can be swept again immediately if they return within sixty days of a closure.</p>
+
+    <p class="cp-p">Street Spirit analyzed and mapped this process using the city's public encampment intervention data, which documents the work of the designated Encampment Management Abatement Team (EMAT). This map visualizes for the first time the size and scale of these operations.</p>
+
+    <p class="cp-p">Each record in Oakland's dataset corresponds with one "notice to vacate." Unhoused people often call these "pink slips" or "red-tags," owing to their color. These are flyers that announce an upcoming closure. EMAT workers will post them on tents, RVs, and light poles surrounding an encampment between 72 hours and 7 days before they arrive, except in emergency situations.</p>
+
+    <p class="cp-p">City workers print out new flyers for every separate block or area. For example, one flyer might say "MLK between 54th St and 55th St" and the next will say "MLK between 55th St and 56th St." Others will list whole parks, such as "Mosswood Park." The data corresponds directly to this practice — there is approximately one new record for each posting. You can understand a "posting" as an individual "pink slip" or flyer, and an "operation" as the simultaneous closure of a larger area that encompasses one continuous encampment or several encampments in close proximity.</p>
+
+    <p class="cp-p">There are 2,200 records in the dataset. Street Spirit's analysis has aggregated these postings into 791 continuous operations between January 2021 and November 2025.</p>
+
+    <p class="cp-p">This map creates a striking portrayal of the city's widespread efforts to control its growing homeless population. However, it is significantly lacking. It does not capture the number of people who lived at the site of a closure, or whether they were offered shelter. It does not collect information about the storage of personal property, citation, or arrest. It does not confirm whether or not the intervention actually occurred. At the time of publication, the dataset had not been updated since December 3rd, 2025.</p>
+
+    <p class="cp-p">Despite these limitations, this dataset is the most extensive available record of encampment interventions in Oakland. According to Oakland Public Information Officer Jean Walsh, it is an accurate representation of the actions performed by the designated Encampment Management Abatement Team since 2021.</p>
+
+    <div class="cp-section-header">Using the Map</div>
+    <p class="cp-p">The map has a number of uses. You can:</p>
+    <ul class="cp-list" style="margin-left: 80px;">
+      <li><strong style="color: var(--accent-red);">Read and contribute oral histories</strong></li>
+      <li><strong style="color: var(--accent-red);">Search for locations</strong> to find closures that have happened near a specific address</li>
+      <li><strong style="color: var(--accent-red);">Filter by date</strong> to see closures that occurred during a specific time period</li>
+      <li><strong style="color: var(--accent-red);">Filter by era</strong> to see closures that occurred before and after the Supreme Court's <em>Grants Pass v. Johnson</em> ruling, or during different mayoral terms</li>
+      <li><strong style="color: var(--accent-red);">View by district</strong> to see closures that occurred in different council districts</li>
+      <li><strong style="color: var(--accent-red);">Filter by sensitivity zones <span style="color: #000;">and</span> intervention types</strong></li>
+      <li><strong style="color: var(--accent-red);">Filter by operation length <span style="color: #000;">and</span> the number of associated postings</strong></li>
+      <li><strong style="color: var(--accent-red);">Animate the map</strong> to watch a time lapse of sweeps</li>
+      <li><strong style="color: var(--accent-red);">Draw custom zones</strong> to examine how many sweeps occurred in that area</li>
+      <li><strong style="color: var(--accent-red);">Examine and export the data directly</strong></li>
+    </ul>
+
+    <p class="cp-p">Street Spirit created this map to help Oakland residents and others understand the scope and scale of encampment closures in the city, and how Oakland's response to homelessness has changed over time. The result is a visualization of constant relocation; a fact of life for Oakland's unsheltered residents.</p>
+  `;
+  panel.getBoundingClientRect();
+  panel.classList.add('open');
+}
+
+function openAnalysisPanel() {
+  closeFiltersForContentPanel();
+  const panel = document.getElementById('content-panel');
+  const body  = document.getElementById('content-panel-body');
+  panel.classList.add('modal-panel');
+  body.innerHTML = `
+    <div class="cp-title">Analysis</div>
+
+    <p class="cp-p">Street Spirit created this map to be a tool for journalists and researchers. In the past six months of cleaning, discussing, and visualizing this data, several key trends have emerged about Oakland's Encampment Management practices.</p>
+
+    <div class="cp-trend-box">
+      <div class="cp-trend-label">Trend #1</div>
+      <div class="cp-section-header">The City of Oakland has transitioned to conducting almost exclusively Full Closures since June 2024.</div>
+    </div>
+    <div class="cp-figure">
+      <img src="MAP%20INFOGRAPHICS/INTERVENTION%20TYPES.png" alt="Intervention types over time" />
+      <div class="cp-caption">Other intervention types, such as deep cleanings, remove debris from the encampment but are intended to permit residents to stay in the same location. Full Closures require complete relocation and a removal of all belongings from the site.</div>
+    </div>
+
+    <div class="cp-trend-box">
+      <div class="cp-trend-label">Trend #2</div>
+      <div class="cp-section-header">The number of individual "postings" has gone up.</div>
+    </div>
+    <p class="cp-p">That is, the number of notices the city posts before an operation, like a closure. However, the number of operations seems to remain relatively consistent.</p>
+    <p class="cp-p">There has been a spike in the number of individual postings in the dataset in the last few years, but a relatively consistent number of larger operations. This corresponds to a spike in the number of postings per operation, which means the number of blocks that the City posts notices on at the same time has increased drastically. This demonstrates that Oakland's operations span more area and occur over longer time frames than in the past.</p>
+    <div class="cp-figure">
+      <img src="MAP%20INFOGRAPHICS/POSTINGS-OVERTIME.png" alt="Postings over time" />
+    </div>
+    <div class="cp-figure">
+      <img src="MAP%20INFOGRAPHICS/OPS-OVERTIME.png" alt="Operations over time" />
+      <div class="cp-caption">Similar graphs (like the one above) displaying the same data have been cited by various news organizations in order to demonstrate an increase in the city's aggression following Grants Pass v. Johnson. After Street Spirit grouped the postings into larger operations, we found that there has not been a spike in the number of operations.</div>
+    </div>
+
+    <div class="cp-trend-box">
+      <div class="cp-trend-label">Trend #3</div>
+      <div class="cp-section-header">A relatively few large operations have contributed to the spike in postings.</div>
+    </div>
+    <p class="cp-p">The top ten largest operations comprise over 30 percent of the records in the dataset (663 out of 2,200).</p>
+    <div class="cp-figure">
+      <img src="MAP%20INFOGRAPHICS/PostingPerOp.png" alt="Postings per operation" />
+      <div class="cp-caption">While many operations in 2025 had the same number of associated postings as in past years, there was a clear increase in the number of much larger operations. Additionally, there were a few extremely large sweeps documented as outliers on this chart.</div>
+    </div>
+    <p class="cp-p">A higher number of postings does not necessarily correspond to a larger encampment, or a higher number of people. For example, the June 2025 operation in the area surrounding E12th St and 40th St in East Oakland was associated with 81 postings. This operation affected a non-dense community of dispersed vehicle dwellers, according to Kelsey Hubbard, a local advocate who provided on-the-ground support to residents during the closure. The operation included many postings because the geographic area where the community was spread out was large.</p>
+
+    <div class="cp-trend-box">
+      <div class="cp-trend-label">Trend #4</div>
+      <div class="cp-section-header">Operations have become much longer.</div>
+    </div>
+    <p class="cp-p">The same blocks will often be noticed for many weeks in a row.</p>
+    <div class="cp-figure">
+      <img src="MAP%20INFOGRAPHICS/OP-LENGTH.png" alt="Operation length over time" />
+    </div>
+    <p class="cp-p">When asked how the encampment management teams' strategy had changed over time, the City of Oakland's Public Information Officer Jean Walsh said:</p>
+    <div class="cp-blockquote">"EMAT's strategy is dependent on resources available, staffing and interim shelter beds. The focus remains on using available resources as efficiently as possible to address the areas of greatest need. Targeted encampment closures may also be advanced through Encampment Resolution Funding (ERF) when such funds are awarded to the City."</div>
+    <p class="cp-p">A clear example of how operations have gotten both larger and longer would be at Lake Merritt. In 2025, the City of Oakland posted notices across all of Lake Merritt for the entire month of April.</p>
+    <div class="cp-figure-pair">
+      <img src="MAP%20INFOGRAPHICS/Lake-Merrit2024.png" alt="Lake Merritt 2024" />
+      <img src="MAP%20INFOGRAPHICS/Lake-Merrit2025.png" alt="Lake Merritt 2025" />
+    </div>
+    <div class="cp-caption">In 2025, the City of Oakland posted encampment closure notices across a larger geographic area and longer timeframe compared to past years.</div>
+
+    <div class="cp-section-header">Keep Exploring</div>
+    <p class="cp-p">As you explore the map, you can visually locate large operations easily, due to the high number of clustered posting dots. We encourage readers to explore the map in order to better understand the City of Oakland's actions, and conduct further analysis.</p>
+    <div class="cp-section-header">Additional Trends</div>
+    <ul class="cp-list" style="margin-left: 80px;">
+      <li>Almost all of the locations in the dataset are associated with more than one posting, meaning that the city often returns to the same location many times. Some places have been closed dozens of times. For example, Mosswood Park had been closed 26 times. Many of the closures are centered in areas surrounding historically large encampments, such as MLK &amp; 23rd and Wood St.</li>
+      <li>The City's "Sensitivity Zones" change frequently. Often, the same location will be listed as "High Sensitivity Zone" on one date and "Low Sensitivity Zone" on another.</li>
+    </ul>
+  `;
+  panel.getBoundingClientRect();
   panel.classList.add('open');
 }
 
@@ -1598,29 +1732,46 @@ function openMethodologiesPanel() {
   const body  = document.getElementById('content-panel-body');
   panel.classList.add('modal-panel');
   body.innerHTML = `
-    <div class="meth-panel">
     <div class="cp-title">Methodologies</div>
 
     <div class="cp-accordion">
       <button class="cp-acc-header" onclick="toggleAccordion('meth-1')">
-        Terminology <span class="cp-acc-chevron" id="meth-1-chev">▼</span>
+        Terminology: Postings, Operations &amp; Encampment Sweeps <span class="cp-acc-chevron" id="meth-1-chev">▼</span>
       </button>
       <div class="cp-acc-body" id="meth-1">
-        <p class="cp-p">Often, people refer to encampment closures as <em>sweeps</em>. We struggled to align these words with clear definitions for the purposes of our project. If two tents next to each other are removed on the same day, is that one sweep or two? If a large community is removed, is that one large sweep, or many small ones? There are also a range of sweeps not represented in this dataset at all — for example, move-along orders, or sweeps performed by CalTrans or private agencies. For these reasons, Street Spirit elected instead to utilize the words <strong>closures</strong>, <strong>postings</strong>, and <strong>operations</strong>.</p>
-        <p class="cp-p">A <strong>closure</strong> aligns with what is laid out in Oakland's Encampment Abatement Policy: when officials from the city's Encampment Management Abatement Team physically shut down and clear an encampment site. Before a closure, workers print flyers — generally called "pink slips," "pink tags," or "red tags" (red tags typically refer to RVs or cars at risk of being towed) — and tape them to tents, vehicles, and structures in the area. These announce that public works officials will arrive to close a specific area on a specific date.</p>
-        <p class="cp-p">In the City's dataset, each new closure record corresponds to a new location, even if they are adjoining streets closed on the same day. The number therefore reflects how many different flyers the City printed and posted, rather than how many separate closures were necessarily conducted. For this reason, we refer to the city's records as <strong>postings</strong>.</p>
-        <p class="cp-p">Our analysis groups postings together to form <strong>continuous operations</strong> when they are geographically proximate and occur within a continuous time frame. There are 2,201 postings in the City's dataset, which we have aggregated into 791 operations.</p>
-        <p class="cp-p">There are five types of encampment interventions described in the Encampment Management Policy, ranging from <em>Health &amp; Hygiene</em> (routine sanitation) to <em>Deep Cleanings</em> (temporary displacement while an area is cleaned). <em>Partial Closures</em> permanently close one section of an encampment while residents largely remain. <em>Full Closures</em> describe a complete and permanent closure, where re-encampment is prohibited. <em>Emergency Closures</em> are the same as Full Closures but can happen without the standard noticing procedures. Almost 80% of records in this dataset represent Full Closures. Our data is organized into "Full Closure," "Deep Cleaning," and "Other."</p>
+        <p class="cp-p">Often, people refer to encampment closures as sweeps. They also might say that the city is sweeping, or somebody is getting swept.</p>
+        <p class="cp-p">We struggled to align these words with clear definitions for the purposes of our project. If two tents next to each other are removed on the same day, is that one sweep or two? If a large community comprised of many tents and vehicles is removed, is that one large sweep, or many small ones? How can you compare a sweep that affects many people to one where only one person is forced to move? Further, there are a range of sweeps not represented in this dataset at all — for example, move-along orders, or sweeps performed by CalTrans or private agencies. For these reasons, Street Spirit elected to use the words <strong>closures</strong>, <strong>postings</strong>, and <strong>city operations</strong>.</p>
+        <p class="cp-p">Our definition of a <strong>closure</strong> aligns with Oakland's Encampment Abatement Policy: when officials from the city's Encampment Management Abatement Team physically shut down and clear an encampment site, forcing residents to relocate, towing vehicles, and disposing of tents and belongings.</p>
+        <p class="cp-p">Before a closure, workers print flyers — generally called "pink slips," "pink tags," or "red tags" — and tape them to tents, RVs, vehicles, light poles, and other structures in the area. They announce that public works officials will arrive to close a specific area on a specific date. The specific area is generally not larger than a single block or a single park. Common closure locations include:</p>
+        <ul class="cp-list" style="margin-left: 60px;">
+          <li>Mosswood Park</li>
+          <li>Solano Way between 14th Ave and 15th Ave</li>
+          <li>Solano Way between 15th Ave and 16th Ave</li>
+        </ul>
+        <p class="cp-p">In the City's dataset, each new closure record corresponds to a new location, even if they are adjoining streets closed on the same day. The number therefore reflects how many different flyers the City printed and posted, rather than how many separate closures were necessarily conducted. For this reason, we refer to the city's records as <strong>postings</strong>. There are 2,201 postings in the dataset, which we have aggregated into 791 continuous <strong>operations</strong>.</p>
+        <p class="cp-p">Without context, using 2,201 to reflect the total number of "sweeps" or closures since 2021 misconstrues the on-the-ground reality of encampment closures.</p>
+        <p class="cp-p">Our analysis groups postings together to form continuous operations when they are geographically proximate and occur within a continuous time frame. Frequently, the city posts notices on several blocks at a time, sometimes stretching an entire neighborhood. Many large operations span several weeks, with new flyers issued each week. Our definition of a continuous time frame excludes breaks for weekends and holidays.</p>
+        <p class="cp-p">Here are the seven locations that make up operation 35_1 — all Full Closures with the same date range (October 20–24, 2025), all on continuous blocks:</p>
+        <ul class="cp-list" style="margin-left: 60px;">
+          <li>3rd St between Center St and Chester St</li>
+          <li>3rd St between Chester St and Henry St</li>
+          <li>3rd St between Henry St &amp; Lewis St</li>
+          <li>3rd St between Lewis St &amp; Peralta St</li>
+          <li>Peralta St between 3rd St &amp; 5th St</li>
+          <li>Peralta St between 5th St and 7th St</li>
+          <li>South Prescott Park and Dog Park</li>
+        </ul>
+        <p class="cp-p">There are five types of encampment interventions in Oakland's Encampment Management Plan, ranging from <em>Health &amp; Hygiene</em> (routine sanitation) to <em>Deep Cleanings</em> (temporary displacement while an area is cleaned), <em>Partial Closures</em>, <em>Full Closures</em>, and <em>Emergency Closures</em>. Almost 80% of records represent Full Closures. Out of 1,280 postings since June 2024, only eighteen were not Full Closures. Our data is organized into three categories: Full Closure, Deep Cleaning, and Other.</p>
       </div>
     </div>
 
     <div class="cp-accordion">
       <button class="cp-acc-header" onclick="toggleAccordion('meth-2')">
-        What this dataset doesn't capture <span class="cp-acc-chevron" id="meth-2-chev">▼</span>
+        What the Dataset Doesn't Capture <span class="cp-acc-chevron" id="meth-2-chev">▼</span>
       </button>
       <div class="cp-acc-body" id="meth-2">
         <p class="cp-p">We have worked to analyze this dataset accurately based on its own lexicon of terms and activities. However, it does not capture the full picture of encampment management in Oakland. This data does not tell us:</p>
-        <ul class="cp-list">
+        <ul class="cp-list" style="margin-left: 60px;">
           <li>How many people live in the encampments being closed</li>
           <li>How many people are offered shelter</li>
           <li>If belongings were thrown away, and if so, what belongings</li>
@@ -1637,16 +1788,32 @@ function openMethodologiesPanel() {
 
     <div class="cp-accordion">
       <button class="cp-acc-header" onclick="toggleAccordion('meth-3')">
-        Data processing steps <span class="cp-acc-chevron" id="meth-3-chev">▼</span>
+        Data Processing <span class="cp-acc-chevron" id="meth-3-chev">▼</span>
       </button>
       <div class="cp-acc-body" id="meth-3">
-        <p class="cp-p">To make this map, we utilized: VSCode, QGIS, Mapbox, Google API, OpenStreetMaps API, Google Earth, and Claude.</p>
-        <p class="cp-p"><strong>Step 1 — Downloading.</strong> The most recent data was downloaded from the City of Oakland Data portal, which we check regularly for updates.</p>
-        <p class="cp-p"><strong>Step 2 — Cleaning.</strong> Location strings are cleaned and made to follow a uniform format. Locations are separated into "betweens" (street segments between two intersections, e.g. "MLK Between 45th and 46th") and "others" (parks, landmarks). Each "between" is converted into two intersection points and run through the Google API to return lat/long pairs. The OSM Roads network is then used to draw a road segment between those coordinates. Lines are exported into QGIS and cleaned manually. Non-street locations like parks are manually drawn as polygons in Google Earth.</p>
-        <p class="cp-p"><strong>Step 3 — Aggregating postings into operations.</strong> Postings are first clustered geographically using a DBSCAN algorithm, which assigns each posting a location cluster id. Within each cluster, postings are grouped by time — consecutive dates (excluding weekends and holidays) are merged into a single operation. Each posting receives an operation id in the format XX_XX. After automated clustering, our team manually verified each operation, correcting cases where blocks were too far apart to cluster despite being continuous, or where infrastructure like bridges created false geographic proximity. This process produced 791 unique operations.</p>
-        <p class="cp-p"><strong>Step 4 — Mapping.</strong> We chose a color and font scheme to evoke old East Bay newspapers, using Mapbox Monochrome as the basemap. All polygons and lines were hand-verified. Many locations overlap in the dataset, as the street sections themselves overlap. The site is hosted on GitHub.</p>
+        <div class="cp-trend-box">
+          <div class="cp-trend-label">Step 1</div>
+          <div class="cp-section-header">Downloading</div>
+        </div>
+        <p class="cp-p">The most recent data was downloaded from the City of Oakland Data portal, which we check regularly to ensure it has not been updated.</p>
+        <div class="cp-trend-box">
+          <div class="cp-trend-label">Step 2</div>
+          <div class="cp-section-header">Cleaning</div>
+        </div>
+        <p class="cp-p">Location strings are cleaned and made to follow a uniform street format, then separated into "betweens" (street segments between two intersections, e.g. "MLK Between 45th and 46th") and "others" (parks, landmarks). Each "between" is converted into two intersection points, run through a Google API to return lat/long coordinates, and then the OSM Roads network draws a road segment between those points. Those lines are exported into QGIS and cleaned manually. For non-road-segment locations such as "Mosswood Park" or "Lake Merritt," we used Google Earth to manually draw the appropriate polygons.</p>
+        <div class="cp-trend-box">
+          <div class="cp-trend-label">Step 3</div>
+          <div class="cp-section-header">Aggregating Postings into Operations</div>
+        </div>
+        <p class="cp-p">To aggregate postings into operations, they are first clustered geographically using a DBSCAN algorithm, assigning each posting a location cluster ID (1–55). Within each cluster, postings are grouped by time — combined if they fall on the same or immediately sequential dates (excluding holidays and weekends). Each posting receives a temporal event ID, and the two IDs are combined to create an operation_id (XX_XX). There were 560 unique operation cluster IDs.</p>
+        <p class="cp-p">Our team and volunteers then manually verified each operation, correcting small errors — such as blocks too far apart to cluster together, or operations that could not be geographically continuous due to infrastructure like bridges. After verification, there were 719 unique operations.</p>
+        <div class="cp-trend-box">
+          <div class="cp-trend-label">Step 4</div>
+          <div class="cp-section-header">Mapping</div>
+        </div>
+        <p class="cp-p">We chose a color and font scheme to evoke old East Bay newspapers, using Mapbox Monochrome as the basemap. All polygons and lines were hand-verified. Many locations overlap in the dataset, as the street sections themselves overlap. The site is hosted on GitHub.</p>
+        <p class="cp-p">To make this map, we utilized the following software: VSCode (data cleaning with Python, Claude Code for assistance with HTML, CSS, and JS), QGIS, Mapbox, Google API, OpenStreetMaps API, Google Earth.</p>
       </div>
-    </div>
     </div>
   `;
   panel.getBoundingClientRect();

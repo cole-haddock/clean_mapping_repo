@@ -1,0 +1,43 @@
+This is not a map of homeless encampments. This map documents four years of the City of Oakland’s attempts to close and clean encampments on city property. 
+
+Five days a week, a team of police officers, officials, outreach staff, and public works employees traverse the City of Oakland to perform the work of “managing” encampments: Picking up garbage, hauling away tents, breaking down self-built structures, towing vehicles, and at times, making shelter offers. When their work is done, the ground is power-washed and encampment residents are forced to find somewhere else to stay. Residents can be swept again immediately if they return within sixty days of a closure.  
+
+Street Spirit analyzed and mapped this process using the city’s public encampment intervention data, which documents the work of the designated Encampment Management Abatement Team (EMAT). This map visualizes for the first time the size and scale of these operations.
+
+
+
+Each record in Oakland’s dataset corresponds with one  “notice to vacate.” Unhoused people often call these “pink slips” or “red-tags,” owing to their color. These are flyers that announce an upcoming closure. EMAT workers will post them on tents, RVs, and light poles surrounding an encampment between 72 hours and 7 days before they arrive, except in emergency situations. 
+
+City workers print out new flyers for every separate block or area. For example, one flyer might say “MLK between 54th St and 55th St” and the next will say “MLK between 55th St and 56th St.” Others will list whole parks, such as “Mosswood Park.” The data corresponds directly to this practice — there is approximately one new record for each posting. You can understand a “posting” as an individual “pink slip” or flyer, and an "operation" as the simultaneous closure of a larger area that encompasses one continuous encampment or several encampments in close proximity. 
+
+There are 2,200 records in the dataset. Street Spirit’s analysis has aggregated these postings into 791 continuous operations between January 2021 and November 2025. 
+
+This map creates a striking portrayal of the city’s widespread efforts to control its growing homeless population. However, it is significantly lacking. It does not capture the number of people who lived at the site of a closure, or whether they were offered shelter. It does not collect information about the storage of personal property, citation, or arrest. It does not confirm whether or not the intervention actually occurred. At the time of publication, the dataset had not been updated since December 3rd, 2025. 
+
+Despite these limitations, this dataset is the most extensive available record of encampment interventions in Oakland. According to Oakland Public Information Officer Jean Walsh, it is an accurate representation of the actions performed by the designated Encampment Management Abatement Team since 2021. 
+
+
+
+The map has a number of uses. You can:
+
+Read and contribute oral histories 
+Search for locations to find closures that have happened near a specific address
+Filter by date to see closures that occurred during a specific time period. 
+Filter by era to see closures that occurred before and after the Supreme Court’s Grants Pass v. Johnson ruling, or during different mayoral terms. 
+View by district to see closures that occurred in different council districts
+Filter by sensitivity zones and intervention types
+Filter by operation length and the number of associated postings
+Animate the map to watch a time lapse of sweeps 
+Draw custom zones to examine how many sweeps occurred in that area.
+Examine and export the data directly. 
+
+Street Spirit created this map to help Oakland residents and others understand the scope and scale of encampment closures in the city, and how Oakland’s response to homelessness has changed over time. The result is a visualization of constant relocation; a fact of life for those Oakland’s unsheltered residents. 
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,62 @@
+Street Spirit created this map to be a tool for journalists and researchers. In the past six months of cleaning, discussing, and visualizing this data, several key trends have emerged about Oakland’s Encampment Management practices. 
+
+
+TREND #1
+The City of Oakland has transitioned to conducting almost exclusively Full Closures since June 2024.
+
+
+(Insert: intervention image)
+Caption: Other intervention types, such as deep cleanings, remove debris from the encampment but are intended to permit residents to stay in the same location. Full Closures require complete relocation and a removal of all belongings from the site.
+
+
+TREND #2
+The number of individual “postings” has gone up. 
+
+That is, the number of notices the city posts before an operation, like a closure. However, the number of operations seems to remain relatively consistent.
+
+There has been a spike in the number of individual postings in the dataset in the last few years, but a relatively consistent number of larger operations. This corresponds to a spike in the number of postings per operation, which means the number of blocks that the City posts notices on at the same time has increased drastically. This demonstrates that Oakland’s operations span more area and occur over longer time frames than in the past.
+
+
+Insert: postings over time directly over ops overtime image
+
+Caption: Similar graphs [to the one on the top] displaying the same data have been cited by various news organizations in order to demonstrate an increase in the city’s aggression following Grants Pass v. Johnson. After Street Spirit grouped the postings into larger operations, we found that there has not been a spike in the number of operations.
+
+
+
+TREND #3
+A relatively few large operations have contributed to the spike in postings. 
+
+The top ten largest operations comprise over 30 percent of the records in the dataset (663 out of 2200) 
+
+Insert: postings per op image
+Caption: While many operations in 2025 had the same number of associated postings as in past years, there was a clear increase in the number of much larger operations. Additionally, there were a few extremely large sweeps documented as outliers on this chart. 
+
+A higher number of postings does not necessarily correspond to a larger encampment, or a higher number of people. For example, the June 2025 operation in the area surrounding E12th St and 40th St in East Oakland was associated with 81 postings. This operation affected a non-dense community of dispersed vehicle dwellers, according to Kelsey Hubbard, a local advocate who provided on the ground support to residents during the closure. The operation included many postings because the geographic area where the community was spread out was large. 
+
+
+
+TREND #4
+Operations have become much longer. 
+
+The same blocks will often be noticed for many weeks in a row.
+
+  ((Insert ops length image))
+
+
+When asked how the encampment management teams’ strategy had changed over time, the City of Oakland’s Public Information Officer Jean Walsh said, “EMAT’s strategy is dependent on resources available, staffing and interim shelter beds. The focus remains on using available resources as efficiently as possible to address the areas of greatest need. Targeted encampment closures may also be advanced through Encampment Resolution Funding (ERF) when such funds are awarded to the City.”
+
+A clear example of how operations have gotten both  larger and longer would be at Lake Merritt. In 2025, the City of Oakland posted notices across all of Lake Merritt for the entire month of April.  
+
+
+((insert LAKE MERRIT image))
+Caption: In 2025, the City of Oakland posted encampment closure notices across a larger geographic area and longer timeframe in 2025 compared to past years. 
+
+Keep exploring
+
+As you explore the map, you can visually locate large operations easily, due to the high number of clustered posting dots. We encourage readers to explore the map in order to better understand the City of Oakland’s actions, and conduct further analysis. 
+
+Additional trends that we noted:
+
+Almost all of the locations in the dataset are associated with more than one posting, meaning that the city often returns to the same location many times. Some places have been closed dozens of times. For example, Mosswood Park had been closed 26 times. Many of the closures are centered in areas surrounding historically large encampments, such as MLK & 23rd and Wood St. 
+
+The City’s “Sensitivity Zones” change frequently. Often, the same location will be listed as “High Sensitivity Zone” on one date and “Low Sensitivity Zone” on another.
