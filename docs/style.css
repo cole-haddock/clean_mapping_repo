@@ -1730,3 +1730,50 @@ mapbox-search-box {
   border: 1px solid var(--panel-border);
   box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
+/* ── Mobile notice ───────────────────────────────────────────────────────── */
+#mobile-notice {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  #mobile-notice {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .mn-box {
+    background: var(--panel-bg);
+    border: 2px solid var(--accent-red);
+    border-radius: 4px;
+    padding: 32px 28px;
+    max-width: 340px;
+    text-align: center;
+  }
+
+  .mn-text {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+  }
+
+  .mn-close {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--accent-red);
+    color: #fff;
+    border: none;
+    padding: 10px 28px;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+}
