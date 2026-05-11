@@ -1751,28 +1751,29 @@ mapbox-search-box {
     background: var(--panel-bg);
     border: 2px solid var(--accent-red);
     border-radius: 4px;
-    padding: 32px 28px;
-    max-width: 340px;
+    padding: 48px 36px;
+    width: 90vw;
+    max-width: 420px;
     text-align: center;
   }
 
   .mn-text {
     font-family: var(--font-mono);
-    font-size: 18px;
-    line-height: 1.6;
+    font-size: 22px;
+    line-height: 1.7;
     color: var(--text-primary);
-    margin-bottom: 24px;
+    margin-bottom: 32px;
   }
 
   .mn-close {
     font-family: var(--font-mono);
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     background: var(--accent-red);
     color: #fff;
     border: none;
-    padding: 10px 28px;
+    padding: 14px 40px;
     cursor: pointer;
     border-radius: 2px;
   }
