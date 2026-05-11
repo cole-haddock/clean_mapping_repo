@@ -1776,4 +1776,93 @@ mapbox-search-box {
     cursor: pointer;
     border-radius: 2px;
   }
+
+  /* ── Header ── */
+  :root { --header-h: 56px; }
+
+  header { padding: 0 12px; }
+
+  .header-title { font-size: 14px; }
+
+  .counts-stats { font-size: 11px; }
+  .counts-date  { font-size: 10px; }
+
+  .header-logo { height: 28px; }
+
+  /* ── Left nav ── */
+  #left-sidebar {
+    width: 100vw;
+  }
+
+  /* ── Filters panel ── */
+  #filters-panel {
+    width: 100vw;
+  }
+
+  /* ── Right sidebar → bottom sheet ── */
+  #sidebar {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 72vh;
+    border-left: none;
+    border-top: 2px solid var(--panel-border);
+    border-radius: 14px 14px 0 0;
+    transform: translateY(100%);
+  }
+
+  #sidebar.open {
+    transform: translateY(0);
+  }
+
+  /* ── Content panels → full screen ── */
+  #content-panel {
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100dvh;
+    border-left: none;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #content-panel.open {
+    transform: translateY(0);
+  }
+
+  #content-panel.modal-panel {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    border: none;
+    transform: translateY(100%);
+    opacity: 1;
+    pointer-events: none;
+  }
+
+  #content-panel.modal-panel.open {
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .content-panel-inner {
+    padding: 28px 20px 24px;
+  }
+
+  /* ── Tap targets ── */
+  .ls-toggle-btn,
+  .ls-draw-btn,
+  .fp-action-btn {
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .ls-nav-btn {
+    padding: 14px 0;
+    font-size: 15px;
+  }
 }
