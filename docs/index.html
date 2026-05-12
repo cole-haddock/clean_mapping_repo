@@ -38,8 +38,15 @@
   <div class="map-wrap">
     <div id="map"></div>
 
+    <!-- Mobile controls (hidden on desktop) -->
+    <div id="mobile-btns">
+      <button id="mobile-toc-btn" onclick="toggleLeftSidebar()">Table of Contents</button>
+      <button id="mobile-legend-btn" onclick="toggleMobileLegend()">Legend</button>
+    </div>
+
     <!-- Left Sidebar -->
     <div id="left-sidebar" class="open">
+      <button class="mobile-close-btn" id="mobile-toc-close" onclick="toggleLeftSidebar()">✕</button>
       <div class="left-sidebar-inner">
 
         <button class="ls-nav-btn" onclick="openIntroPanel()">Introduction</button>
@@ -230,6 +237,8 @@
         </div>
       </div>
 
+      <button id="mobile-see-data-btn" onclick="openMobileLocationData()">See data rows for this location</button>
+
       <div class="sb-focus-wrap">
         <button id="btn-focus" class="focus-toggle-btn active" onclick="toggleFocusMode()">See Posting Dots</button>
         <button id="btn-sidebar-filter" class="focus-toggle-btn active" onclick="toggleSidebarFilter()">Only Filtered Rows Showing — Show All</button>
@@ -268,7 +277,8 @@
 
 <!-- Legend + See Data -->
     <div class="legend-stack">
-      <div id="legend" onclick="toggleLegend()">
+      <div id="legend" onclick="window.innerWidth<=768 ? toggleMobileLegend() : toggleLegend()">
+        <button class="mobile-close-btn" id="mobile-legend-close" onclick="event.stopPropagation(); toggleMobileLegend()">✕</button>
         <div class="legend-header">
           Legend <span class="legend-chevron">▲</span>
         </div>
@@ -308,11 +318,17 @@
   <!-- Content Panel — outside map-wrap to avoid canvas layout interference -->
   <div id="content-panel">
     <button class="sidebar-close" onclick="closeContentPanel()">✕</button>
+    <button class="mobile-panel-back" onclick="closeContentPanel()">←</button>
     <div class="content-panel-inner" id="content-panel-body"></div>
   </div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.4.3/mapbox-gl-draw.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script src="map.js"></script>
+  <script>
+    if (window.innerWidth <= 768) {
+      document.getElementById('left-sidebar').classList.remove('open');
+    }
+  </script>
 </body>
 </html>

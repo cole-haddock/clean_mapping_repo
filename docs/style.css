@@ -1000,15 +1000,18 @@ tbody td.td-oplen-long {
   background: none;
   border: 1px solid var(--panel-border);
   color: var(--text-muted);
-  font-size: 14px;
-  width: 26px;
-  height: 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border-radius: 2px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .fp-close-btn:hover {
@@ -1735,6 +1738,26 @@ mapbox-search-box {
   display: none;
 }
 
+/* ── Mobile control buttons (hidden on desktop) ─────────────────────────── */
+#mobile-btns {
+  display: none;
+}
+
+/* ── Mobile close buttons (hidden on desktop) ───────────────────────────── */
+.mobile-close-btn {
+  display: none;
+}
+
+/* ── Mobile see-data button (hidden on desktop) ─────────────────────────── */
+#mobile-see-data-btn {
+  display: none;
+}
+
+/* ── Mobile panel back arrow (hidden on desktop) ────────────────────────── */
+.mobile-panel-back {
+  display: none;
+}
+
 @media (max-width: 768px) {
   #mobile-notice {
     display: flex;
@@ -1801,37 +1824,86 @@ mapbox-search-box {
 
   /* ── Left nav ── */
   #left-sidebar {
-    width: 100vw;
+    width: max-content;
+    max-width: 85vw;
   }
 
   /* ── Filters panel ── */
   #filters-panel {
     width: 100vw;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Right sidebar → bottom sheet ── */
+  #filters-panel .left-sidebar-inner {
+    overflow-y: visible;
+    flex: none;
+    height: auto;
+    min-height: 0;
+  }
+
+  /* ── Location sidebar → left panel ── */
   #sidebar {
-    top: auto;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    height: 72vh;
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    width: 40vw;
+    height: 100%;
     border-left: none;
-    border-top: 2px solid var(--panel-border);
-    border-radius: 14px 14px 0 0;
-    transform: translateY(100%);
+    border-right: 1px solid var(--panel-border);
+    border-top: none;
+    border-radius: 0;
+    transform: translateX(-100%);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   #sidebar.open {
-    transform: translateY(0);
+    transform: translateX(0);
   }
 
-  /* ── Content panels → full screen ── */
+  #sidebar .table-wrap {
+    display: none;
+  }
+
+  #sidebar .sb-focus-wrap {
+    display: none;
+  }
+
+  #sidebar .sidebar-summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  #sidebar .summary-divider {
+    display: none;
+  }
+
+  #mobile-see-data-btn {
+    display: block;
+    width: calc(100% - 32px);
+    margin: 12px 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--accent-red);
+    border: none;
+    padding: 12px 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-align: center;
+  }
+
+  /* ── Content panels → full screen below header ── */
   #content-panel {
-    top: 0;
+    top: var(--header-h);
     right: 0;
     width: 100vw;
-    height: 100dvh;
+    height: calc(100dvh - var(--header-h));
     border-left: none;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1842,11 +1914,11 @@ mapbox-search-box {
   }
 
   #content-panel.modal-panel {
-    top: 0;
+    top: var(--header-h);
     left: 0;
     width: 100vw;
-    height: 100dvh;
-    max-height: 100dvh;
+    height: calc(100dvh - var(--header-h));
+    max-height: calc(100dvh - var(--header-h));
     border-radius: 0;
     border: none;
     transform: translateY(100%);
@@ -1863,6 +1935,29 @@ mapbox-search-box {
     padding: 28px 20px 24px;
   }
 
+  /* ── Hide desktop ✕, show back arrow on mobile ── */
+  #content-panel .sidebar-close {
+    display: none;
+  }
+
+  .mobile-panel-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 10;
+  }
+
   /* ── Tap targets ── */
   .ls-toggle-btn,
   .ls-draw-btn,
@@ -1872,7 +1967,88 @@ mapbox-search-box {
   }
 
   .ls-nav-btn {
-    padding: 14px 0;
+    padding: 14px 36px;
     font-size: 15px;
+  }
+
+  /* ── Hide built-in sidebar tab on mobile (goes off-screen with 50vw sidebar) ── */
+  .left-sidebar-toggle {
+    display: none;
+  }
+
+  /* ── Hide map controls on mobile ── */
+  .mapboxgl-ctrl-zoom-in,
+  .mapboxgl-ctrl-zoom-out,
+  .mapboxgl-ctrl-compass,
+  .mapboxgl-ctrl-attrib {
+    display: none !important;
+  }
+
+  /* ── Mobile close buttons ── */
+  .mobile-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: 1px solid var(--panel-border);
+    color: var(--text-muted);
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  #legend {
+    position: relative;
+  }
+
+  #legend .legend-chevron {
+    display: none;
+  }
+
+  /* ── Hide map legend on mobile (accessible via Legend button instead) ── */
+  .legend-stack {
+    display: none;
+  }
+
+  .legend-stack.mobile-visible {
+    display: flex;
+  }
+
+  /* ── Floating control buttons ── */
+  #mobile-btns {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: fixed;
+    bottom: 28px;
+    right: 16px;
+    z-index: 10;
+  }
+
+  #mobile-btns.hidden {
+    display: none;
+  }
+
+  #mobile-toc-btn,
+  #mobile-legend-btn {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--panel-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--panel-border);
+    padding: 12px 18px;
+    border-radius: 2px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    cursor: pointer;
+    min-height: 44px;
+    white-space: nowrap;
   }
 }

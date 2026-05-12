@@ -499,6 +499,8 @@ function handleDotClick(props) {
   buildSidebar(locId, postId, props);
   requestAnimationFrame(() => {
     document.getElementById('sidebar').classList.add('open');
+    const mobileBtns = document.getElementById('mobile-btns');
+    if (mobileBtns) mobileBtns.classList.add('hidden');
   });
 }
 
@@ -836,10 +838,29 @@ function closeSidebar() {
 
   // Close panel
   document.getElementById('sidebar').classList.remove('open');
+  const mobileBtns = document.getElementById('mobile-btns');
+  if (mobileBtns) mobileBtns.classList.remove('hidden');
 }
 
 function toggleLegend() {
   document.getElementById('legend').classList.toggle('collapsed');
+}
+
+function openMobileLocationData() {
+  const tableWrap = document.querySelector('#sidebar .table-wrap');
+  const body = document.getElementById('content-panel-body');
+  body.scrollTop = 0;
+  body.innerHTML = tableWrap.innerHTML;
+  const panel = document.getElementById('content-panel');
+  panel.classList.remove('see-data', 'modal-panel');
+  panel.classList.add('open');
+}
+
+function toggleMobileLegend() {
+  const legendStack = document.querySelector('.legend-stack');
+  const mobileBtns = document.getElementById('mobile-btns');
+  legendStack.classList.toggle('mobile-visible');
+  mobileBtns.classList.toggle('hidden', legendStack.classList.contains('mobile-visible'));
 }
 
 function toggleLeftSidebar() {
@@ -848,6 +869,10 @@ function toggleLeftSidebar() {
   if (!sidebar.classList.contains('open')) {
     document.getElementById('filters-panel').classList.remove('open');
     document.getElementById('btn-map-filters').classList.remove('active');
+  }
+  const mobileBtns = document.getElementById('mobile-btns');
+  if (mobileBtns) {
+    mobileBtns.classList.toggle('hidden', sidebar.classList.contains('open'));
   }
 }
 
@@ -1457,6 +1482,7 @@ function closeFiltersForContentPanel() {
     fp.classList.remove('open');
     document.getElementById('btn-map-filters').classList.remove('active');
   }
+  document.getElementById('content-panel-body').scrollTop = 0;
 }
 
 function openOralHistoriesPanel() {
@@ -1840,6 +1866,7 @@ function closeContentPanel() {
 
 function openSeeAllPanel() {
   const panel = document.getElementById('content-panel');
+  document.getElementById('content-panel-body').scrollTop = 0;
   panel.classList.add('see-data');
   panel.getBoundingClientRect();
   panel.classList.add('open');
@@ -1948,6 +1975,8 @@ function updateResetBtn() {
     getCheckedMayors().length < MAYOR_TERMS.length;
   const btn = document.getElementById('btn-reset-filters');
   if (btn) btn.classList.toggle('active', anyActive);
+  const closeBtn = document.querySelector('.fp-close-btn');
+  if (closeBtn) closeBtn.textContent = anyActive ? 'See Filtered Map' : '✕';
 }
 
 function downloadCSV(rows, filename) {
