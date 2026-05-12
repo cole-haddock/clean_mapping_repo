@@ -340,9 +340,9 @@ map.on('load', async () => {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        10, 3,
-        13, 5,
-        16, 8,
+        10, 5,
+        13, 9,
+        16, 13,
       ],
       'circle-color': [
         'case',
