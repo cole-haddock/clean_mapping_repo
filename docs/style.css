@@ -1853,7 +1853,8 @@ mapbox-search-box {
     bottom: auto;
     left: 0;
     right: auto;
-    width: 40vw;
+    width: max-content;
+    max-width: 75vw;
     height: 100%;
     border-left: none;
     border-right: 1px solid var(--panel-border);

@@ -403,6 +403,17 @@ map.on('load', async () => {
     handleDotClick(e.features[0].properties);
   });
 
+  // ── Touchend fallback for mobile (bypasses click synthesis) ────────────
+  if (window.innerWidth <= 768) {
+    map.on('touchend', 'dots-layer', e => {
+      if (drawingActive) return;
+      if (e.features && e.features.length > 0) {
+        e.preventDefault();
+        handleDotClick(e.features[0].properties);
+      }
+    });
+  }
+
   // ── Click a line or polygon → find a matching dot and open sidebar ─────
   ['lines-base', 'polygons-base'].forEach(layer => {
     map.on('click', layer, e => {
