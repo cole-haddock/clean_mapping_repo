@@ -75,6 +75,7 @@ const map = new mapboxgl.Map({
   zoom: 12,
   minZoom: 10,
   maxZoom: 18,
+  clickTolerance: window.innerWidth <= 768 ? 10 : 3,
 });
 
 map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
