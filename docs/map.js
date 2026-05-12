@@ -379,6 +379,16 @@ map.on('load', async () => {
     filter: ['==', ['get', 'posting_id'], -1],  // hidden by default
   });
 
+  // ── Larger touch targets on mobile ────────────────────────────────────
+  if (window.innerWidth <= 768) {
+    map.setPaintProperty('dots-layer', 'circle-radius', [
+      'interpolate', ['linear'], ['zoom'],
+      10, 7,
+      13, 11,
+      16, 15,
+    ]);
+  }
+
   // ── Cursor changes ─────────────────────────────────────────────────────
   ['dots-layer', 'lines-base', 'polygons-base'].forEach(layer => {
     map.on('mouseenter', layer, () => { if (!drawingActive) map.getCanvas().style.cursor = 'pointer'; });

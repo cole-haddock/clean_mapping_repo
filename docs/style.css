@@ -1811,9 +1811,12 @@ mapbox-search-box {
   }
 
   /* ── Header ── */
-  :root { --header-h: 56px; }
+  :root { --header-h: calc(56px + env(safe-area-inset-top, 0px)); }
 
-  header { padding: 0 12px; }
+  header {
+    padding: env(safe-area-inset-top, 0px) 12px 0;
+    height: var(--header-h);
+  }
 
   .header-title { font-size: 14px; }
 
