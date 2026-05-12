@@ -1853,8 +1853,7 @@ mapbox-search-box {
     bottom: auto;
     left: 0;
     right: auto;
-    width: max-content;
-    max-width: 75vw;
+    width: 55vw;
     height: 100%;
     border-left: none;
     border-right: 1px solid var(--panel-border);
@@ -1871,6 +1870,12 @@ mapbox-search-box {
 
   #sidebar .table-wrap {
     display: none;
+  }
+
+  #sidebar .sidebar-location,
+  #sidebar .summary-label {
+    white-space: normal;
+    word-break: break-word;
   }
 
   #sidebar .sb-focus-wrap {
