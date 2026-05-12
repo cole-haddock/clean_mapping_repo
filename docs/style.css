@@ -1829,6 +1829,8 @@ mapbox-search-box {
   #left-sidebar {
     width: max-content;
     max-width: 85vw;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ── Filters panel ── */
@@ -2021,6 +2023,9 @@ mapbox-search-box {
 
   .legend-stack.mobile-visible {
     display: flex;
+    max-height: 60vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* ── Floating control buttons ── */
